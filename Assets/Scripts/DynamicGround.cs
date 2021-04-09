@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -10,19 +8,19 @@ public class DynamicGround : MonoBehaviour
     [SerializeField, Tooltip("In Unity units")]
     private int xSize, zSize;
 
-    [SerializeField, Tooltip("Density")] private int pointPerUnit;
+    [FormerlySerializedAs("pointsPerUnit")] [SerializeField, Tooltip("Density")] private int _pointsPerUnit;
 
-    private int xPoints, zPoints;
-    private Mesh mesh;
-    private bool[,,] skippedQuads; // x,y,z => is quad skipped 
+    private int _xPoints, _zPoints;
+    private Mesh _mesh;
+    private bool[,,] _skippedQuads; // x,y,z => is quad skipped 
 
-    private Vector3[] vertices;
+    private Vector3[] _vertices;
 
     private void Start()
     {
-        xPoints = xSize * pointPerUnit;
-        zPoints = zSize * pointPerUnit;
-        skippedQuads = new bool[xPoints, 1, zPoints];
+        _xPoints = xSize * _pointsPerUnit;
+        _zPoints = zSize * _pointsPerUnit;
+        _skippedQuads = new bool[_xPoints, 1, _zPoints];
         RegenerateMesh();
     }
 
@@ -31,15 +29,15 @@ public class DynamicGround : MonoBehaviour
         // Skip cubes intersected by cutting line
         for (var i = startIndex; i < trailPoints.Count; i++)
         {
-            var cubeX = (int) Mathf.Floor(trailPoints[i].x * pointPerUnit);
-            var cubeZ = (int) Mathf.Floor(trailPoints[i].z * pointPerUnit);
-            if (!skippedQuads[cubeX, 0, cubeZ])
+            var cubeX = (int) Mathf.Floor(trailPoints[i].x * _pointsPerUnit);
+            var cubeZ = (int) Mathf.Floor(trailPoints[i].z * _pointsPerUnit);
+            if (!_skippedQuads[cubeX, 0, cubeZ])
             {
-                skippedQuads[cubeX, 0, cubeZ] = true;
+                _skippedQuads[cubeX, 0, cubeZ] = true;
                 Debug.Log($"cut out {cubeX} 0 {cubeZ}");
                 Debug.DrawLine(
-                    (new Vector3(cubeX, 0, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-                    (new Vector3(cubeX, 1, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
+                    (new Vector3(cubeX, 0, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                    (new Vector3(cubeX, 1, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
                     Color.green,999);
             }
         }
@@ -54,37 +52,20 @@ public class DynamicGround : MonoBehaviour
         //     Color.blue);
 
         // Find floating islands and drop them
-        int maxZ = skippedQuads.GetLength(2);
-        int maxX = skippedQuads.GetLength(0);
+        int maxZ = _skippedQuads.GetLength(2);
+        int maxX = _skippedQuads.GetLength(0);
         for (int z = 1; z < maxZ - 1; z++)
         {
             for (int x = 1; x < maxX - 1; x++)
             {
-                if (skippedQuads[x, 0, z] && !skippedQuads[x + 1, 0, z])  //[ ][+]...
+                if ( MyMath.ContainsPoint(trailPoints, startIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))  
                 {
-                    if ( SomeMaths.IsPointInPolygon(trailPoints, startIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit))  
-                    {
-                            skippedQuads[x, 0, z] = true;
-                            Debug.DrawLine(
-                                (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-                                (new Vector3(x, 2, z) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-                                Color.yellow, 999);
-                    }
+                        _skippedQuads[x, 0, z] = true;
+                        Debug.DrawLine(
+                            (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                            (new Vector3(x, 2, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                            Color.yellow, 999);
                 }
-
-                // var upMissing = skippedQuads[x, 0, z + 1];
-                // var downMissing = skippedQuads[x, 0, z - 1];
-
-                // if (upMissing && downMissing && !skippedQuads[x, 0, z])
-                // {
-                //     Debug.Log($"additionally skipped: {x} 0 {z}");
-                //
-                //     Debug.DrawLine(
-                //         (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-                //         (new Vector3(x, 2, z) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-                //         Color.yellow);
-                //     skippedQuads[x, 0, z] = true;
-                // }
             }
         }
 
@@ -94,10 +75,10 @@ public class DynamicGround : MonoBehaviour
     // find next hole to the right
     private bool IsThisAnIslandX(int xStart, int z)
     {
-        int maxX = skippedQuads.GetLength(0);
+        int maxX = _skippedQuads.GetLength(0);
         for (int x = xStart+1; x < maxX - 1; x++)
         {
-            if (skippedQuads[x, 0, z])
+            if (_skippedQuads[x, 0, z])
             {
                 return true;
             }
@@ -108,10 +89,10 @@ public class DynamicGround : MonoBehaviour
     
     private bool IsThisAnIslandZ(int x, int zStart)
     {
-        int maxZ = skippedQuads.GetLength(2);
+        int maxZ = _skippedQuads.GetLength(2);
         for (int z = zStart+1; z < maxZ - 1; z++)
         {
-            if (skippedQuads[x, 0, z])
+            if (_skippedQuads[x, 0, z])
             {
                 return true;
             }
@@ -122,34 +103,34 @@ public class DynamicGround : MonoBehaviour
 
     private void RegenerateMesh()
     {
-        GetComponent<MeshFilter>().mesh = mesh = new Mesh();
-        mesh.name = "Procedural Grid";
-        vertices = new Vector3[(xPoints + 1) * (zPoints + 1)];
-        for (int i = 0, z = 0; z <= zPoints; z++)
+        GetComponent<MeshFilter>().mesh = _mesh = new Mesh();
+        _mesh.name = "Procedural Grid";
+        _vertices = new Vector3[(_xPoints + 1) * (_zPoints + 1)];
+        for (int i = 0, z = 0; z <= _zPoints; z++)
         {
-            for (int x = 0; x <= xPoints; x++, i++)
+            for (int x = 0; x <= _xPoints; x++, i++)
             {
-                vertices[i] = new Vector3(x / (float) pointPerUnit, 0, z / (float) pointPerUnit);
+                _vertices[i] = new Vector3(x / (float) _pointsPerUnit, 0, z / (float) _pointsPerUnit);
             }
         }
 
-        mesh.vertices = vertices;
+        _mesh.vertices = _vertices;
 
-        int[] triangles = new int[xPoints * zPoints * 6];
-        for (int ti = 0, vi = 0, z = 0; z < zPoints; z++, vi++)
+        int[] triangles = new int[_xPoints * _zPoints * 6];
+        for (int ti = 0, vi = 0, z = 0; z < _zPoints; z++, vi++)
         {
-            for (int x = 0; x < xPoints; x++, ti += 6, vi++)
+            for (int x = 0; x < _xPoints; x++, ti += 6, vi++)
             {
-                if (skippedQuads[x, 0, z]) continue;
+                if (_skippedQuads[x, 0, z]) continue;
 
                 triangles[ti] = vi;
                 triangles[ti + 3] = triangles[ti + 2] = vi + 1;
-                triangles[ti + 4] = triangles[ti + 1] = vi + xPoints + 1;
-                triangles[ti + 5] = vi + xPoints + 2;
+                triangles[ti + 4] = triangles[ti + 1] = vi + _xPoints + 1;
+                triangles[ti + 5] = vi + _xPoints + 2;
             }
         }
 
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+        _mesh.triangles = triangles;
+        _mesh.RecalculateNormals();
     }
 }

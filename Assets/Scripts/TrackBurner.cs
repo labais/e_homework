@@ -1,17 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class TrackBurner : MonoBehaviour
 {
     [SerializeField] private TrailRenderer _trailRenderer;
-    [SerializeField] DynamicGround dynamicGround;
+    [FormerlySerializedAs("dynamicGround")] [SerializeField] DynamicGround _dynamicGround;
     
-    private List<Vector3> trailPoints = new List<Vector3>();
-    private List<DateTime> trailTimes = new List<DateTime>();
-    private Vector3 lastPoint;
+    private readonly List<Vector3> _trailPoints = new List<Vector3>();
+    private readonly List<DateTime> _trailTimes = new List<DateTime>();
+    private Vector3 _lastPoint;
 
     private readonly Vector3 DO = Vector3.up; // Debug Offset for vector drawing
     private readonly Vector3 DO2 = Vector3.up * 0.1f;
@@ -23,27 +22,27 @@ public class TrackBurner : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (lastPoint != transform.position)
+        if (_lastPoint != transform.position)
         {
-            lastPoint = transform.position;
-            AddPointAndCheckIfCrossed(lastPoint);
+            _lastPoint = transform.position;
+            AddPointAndCheckIfCrossed(_lastPoint);
             CutOffOldPoints();
         }
     }
 
     private void AddPointAndCheckIfCrossed(Vector3 newPoint)
     {
-        trailPoints.Add(newPoint);
-        trailTimes.Add(DateTime.Now);
+        _trailPoints.Add(newPoint);
+        _trailTimes.Add(DateTime.Now);
 
-        if (trailPoints.Count < 4) return;
-        var penultimatePoint = trailPoints[trailPoints.Count - 2];
+        if (_trailPoints.Count < 4) return;
+        var penultimatePoint = _trailPoints[_trailPoints.Count - 2];
 
-        for (var i = 0; i < trailPoints.Count - 2; i++)
+        for (var i = 0; i < _trailPoints.Count - 2; i++)
         {
-            if (SomeMaths.AreLinesIntersecting(trailPoints[i], trailPoints[i + 1], penultimatePoint, newPoint))
+            if (MyMath.AreLinesIntersecting(_trailPoints[i], _trailPoints[i + 1], penultimatePoint, newPoint))
             {
-                dynamicGround.UpdateGround(trailPoints, i);
+                _dynamicGround.UpdateGround(_trailPoints, i);
                 DrawArea(i);
                 CutTailAtIndex(i);
                 return;
@@ -56,9 +55,9 @@ public class TrackBurner : MonoBehaviour
     private void DrawArea(int startIndex)
     {
         // @note -- it would be better to use intersection point not [i] and [last], but hopefully no one will notice 
-        for (var i = startIndex; i < trailPoints.Count - 2; i++)
+        for (var i = startIndex; i < _trailPoints.Count - 2; i++)
         {
-            Debug.DrawLine(trailPoints[i] + DO2, trailPoints[i + 1] + DO2, Color.red, 5);
+            Debug.DrawLine(_trailPoints[i] + DO2, _trailPoints[i + 1] + DO2, Color.red, 5);
         }
     }
 
@@ -67,9 +66,9 @@ public class TrackBurner : MonoBehaviour
         var cutoffIndex = -1;
         var cutoffTime = DateTime.Now - TimeSpan.FromSeconds(_trailRenderer.time);
 
-        for (int i = 0; i < trailTimes.Count; i++)
+        for (int i = 0; i < _trailTimes.Count; i++)
         {
-            if (trailTimes[i] > cutoffTime)
+            if (_trailTimes[i] > cutoffTime)
             {
                 cutoffIndex = i;
                 break;
@@ -84,8 +83,8 @@ public class TrackBurner : MonoBehaviour
         // Remove form start of the list
         for (var i = 0; i < cutoffIndex; i++)
         {
-            trailPoints.RemoveAt(0);
-            trailTimes.RemoveAt(0);
+            _trailPoints.RemoveAt(0);
+            _trailTimes.RemoveAt(0);
         }
 
         // Debug.Log($"CutTailAtIndex::num={cutoffIndex}");

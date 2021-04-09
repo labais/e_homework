@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using UnityEngine;
 
-public class SomeMaths
+public class MyMath
 {
     // https://www.habrador.com/tutorials/math/5-line-line-intersection/
     public static bool AreLinesIntersecting(Vector3 l1_p1, Vector3 l1_p2, Vector3 l2_p1, Vector3 l2_p2, bool shouldIncludeEndPoints = true)
@@ -53,24 +51,19 @@ public class SomeMaths
     {
         return new Vector3(v3.x, v3.z, 0);
     }
-    
-    public static bool IsPointInPolygon(List<Vector3> trailPoints, int startIndex, Vector3 testPoint)
+
+    // https://wiki.unity3d.com/index.php/PolyContainsPoint
+    public static bool ContainsPoint(List<Vector3> trailPoints, int startIndex, Vector3 p)
     {
-        bool result = false;
-        int j = trailPoints.Count - 1;
-        for (int i = startIndex; i < trailPoints.Count; i++)
+        var j = trailPoints.Count - 1;
+        var inside = false;
+        for (int i = startIndex; i < trailPoints.Count; j = i++)
         {
-            if (trailPoints[i].z < testPoint.z && trailPoints[j].z >= testPoint.z || trailPoints[j].z < testPoint.z && trailPoints[i].z >= testPoint.z)
-            {
-                if (trailPoints[i].x + (testPoint.z - trailPoints[i].z) / (trailPoints[j].z - trailPoints[i].z) * (trailPoints[j].x - trailPoints[i].x) < testPoint.x)
-                {
-                    result = !result;
-                }
-            }
-            j = i;
+            var pi = trailPoints[i];
+            var pj = trailPoints[j];
+            if (((pi.z <= p.z && p.z < pj.z) || (pj.z <= p.z && p.z < pi.z)) && (p.x < (pj.x - pi.x) * (p.z - pi.z) / (pj.z - pi.z) + pi.x)) inside = !inside;
         }
-        return result;
+
+        return inside;
     }
-    
-    
 }

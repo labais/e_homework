@@ -804,7 +804,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xSize: 10
   zSize: 10
-  pointPerUnit: 2
+  pointsPerUnit: 2
 --- !u!23 &1731904067
 MeshRenderer:
   m_ObjectHideFlags: 0
