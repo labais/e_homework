@@ -34,7 +34,6 @@ public class DynamicGround : MonoBehaviour
             if (!_skippedQuads[cubeX, 0, cubeZ])
             {
                 _skippedQuads[cubeX, 0, cubeZ] = true;
-                Debug.Log($"cut out {cubeX} 0 {cubeZ}");
                 Debug.DrawLine(
                     (new Vector3(cubeX, 0, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
                     (new Vector3(cubeX, 1, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
@@ -42,15 +41,6 @@ public class DynamicGround : MonoBehaviour
             }
         }
         
-        // ielikt tikko izgrieztot klucīšus citā DS un tad pēc tās noskaidrot kurus vēl jānodropo, lai nelido gaisā
-
-        // var xx = (int) Mathf.Floor(trailPoints[trailPoints.Count - 1].x * pointPerUnit);
-        // var zz = (int) Mathf.Floor(trailPoints[trailPoints.Count - 1].z * pointPerUnit);
-        // Debug.DrawLine(
-        //     (new Vector3(xx, 0, zz) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-        //     (new Vector3(xx, 3, zz) + Vector3.forward * .5f + Vector3.right * .5f) / pointPerUnit,
-        //     Color.blue);
-
         // Find floating islands and drop them
         int maxZ = _skippedQuads.GetLength(2);
         int maxX = _skippedQuads.GetLength(0);
