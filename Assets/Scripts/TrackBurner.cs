@@ -7,6 +7,8 @@ using UnityEngine;
 public class TrackBurner : MonoBehaviour
 {
     [SerializeField] private TrailRenderer _trailRenderer;
+    [SerializeField] DynamicGround dynamicGround;
+    
     private List<Vector3> trailPoints = new List<Vector3>();
     private List<DateTime> trailTimes = new List<DateTime>();
     private Vector3 lastPoint;
@@ -21,7 +23,7 @@ public class TrackBurner : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (lastPoint != (Vector3) transform.position)
+        if (lastPoint != transform.position)
         {
             lastPoint = transform.position;
             AddPointAndCheckIfCrossed(lastPoint);
@@ -39,17 +41,16 @@ public class TrackBurner : MonoBehaviour
 
         for (var i = 0; i < trailPoints.Count - 2; i++)
         {
-            if (AreLinesIntersecting(trailPoints[i], trailPoints[i + 1], penultimatePoint, newPoint))
+            if (SomeMaths.AreLinesIntersecting(trailPoints[i], trailPoints[i + 1], penultimatePoint, newPoint))
             {
-                //Do smtn w/ this area
+                dynamicGround.UpdateGround(trailPoints, i);
                 DrawArea(i);
-                trailPoints.Clear();
-                trailTimes.Clear();
+                CutTailAtIndex(i);
                 return;
             }
         }
 
-        Debug.Log($"trail.Count={trailPoints.Count}");
+        // Debug.Log($"trail.Count={trailPoints.Count}");
     }
 
     private void DrawArea(int startIndex)
@@ -59,55 +60,6 @@ public class TrackBurner : MonoBehaviour
         {
             Debug.DrawLine(trailPoints[i] + DO2, trailPoints[i + 1] + DO2, Color.red, 5);
         }
-    }
-
-    // https://www.habrador.com/tutorials/math/5-line-line-intersection/
-    private bool AreLinesIntersecting(Vector3 l1_p1, Vector3 l1_p2, Vector3 l2_p1, Vector3 l2_p2, bool shouldIncludeEndPoints = true)
-    {
-        l1_p1 = squashVector(l1_p1);
-        l1_p2 = squashVector(l1_p2);
-        l2_p1 = squashVector(l2_p1);
-        l2_p2 = squashVector(l2_p2);
-
-        //To avoid floating point precision issues we can add a small value
-        float epsilon = 0.00001f;
-
-        bool isIntersecting = false;
-
-        float denominator = (l2_p2.y - l2_p1.y) * (l1_p2.x - l1_p1.x) - (l2_p2.x - l2_p1.x) * (l1_p2.y - l1_p1.y);
-
-        //Make sure the denominator is > 0, if not the lines are parallel
-        if (denominator != 0f)
-        {
-            float u_a = ((l2_p2.x - l2_p1.x) * (l1_p1.y - l2_p1.y) - (l2_p2.y - l2_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
-            float u_b = ((l1_p2.x - l1_p1.x) * (l1_p1.y - l2_p1.y) - (l1_p2.y - l1_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
-
-            //Are the line segments intersecting if the end points are the same
-            if (shouldIncludeEndPoints)
-            {
-                //Is intersecting if u_a and u_b are between 0 and 1 or exactly 0 or 1
-                if (u_a >= 0f + epsilon && u_a <= 1f - epsilon && u_b >= 0f + epsilon && u_b <= 1f - epsilon)
-                {
-                    isIntersecting = true;
-                }
-            }
-            else
-            {
-                //Is intersecting if u_a and u_b are between 0 and 1
-                if (u_a > 0f + epsilon && u_a < 1f - epsilon && u_b > 0f + epsilon && u_b < 1f - epsilon)
-                {
-                    isIntersecting = true;
-                }
-            }
-        }
-
-        return isIntersecting;
-    }
-
-    // From XZ plane uz XY plane
-    Vector3 squashVector(Vector3 v3)
-    {
-        return new Vector3(v3.x, v3.z, 0);
     }
 
     private void CutOffOldPoints()
@@ -136,6 +88,6 @@ public class TrackBurner : MonoBehaviour
             trailTimes.RemoveAt(0);
         }
 
-        Debug.Log($"CutTailAtIndex::num={cutoffIndex}");
+        // Debug.Log($"CutTailAtIndex::num={cutoffIndex}");
     }
 }
