@@ -16,6 +16,7 @@ public class DynamicGround : MonoBehaviour
     private bool[,,] _skippedQuads; // x,y,z => is quad skipped  (coords are for quad's lower bottom corner)
 
     private Vector3[] _vertices;
+    private bool[] _verticesMoved; // To make sure only vertex is moved only once
 
     private void Start()
     {
@@ -68,6 +69,7 @@ public class DynamicGround : MonoBehaviour
             GetComponent<MeshFilter>().mesh = _mesh = new Mesh();
             _mesh.name = "Procedural Grid";
             _vertices = new Vector3[(_xPoints + 1) * (_zPoints + 1)];
+            _verticesMoved = new bool[(_xPoints + 1) * (_zPoints + 1)];
             for (int i = 0, z = 0; z <= _zPoints; z++)
             {
                 for (int x = 0; x <= _xPoints; x++, i++)
@@ -125,6 +127,14 @@ public class DynamicGround : MonoBehaviour
     private void DistortPoint(int x, int z, List<Vector3> trailPoints = null, int trailStartIndex = 0)
     {
         var vertexIndex = z * (_zPoints + 1) + x;
+        if (_verticesMoved[vertexIndex]) // Leave already moved ones alone!
+        {
+            Debug.DrawLine(
+                new Vector3(x, 0, z) / _pointsPerUnit,
+                new Vector3(x, 2, z) / _pointsPerUnit,
+                Color.black, 999);
+            return; 
+        }
 
         Debug.DrawLine(
             new Vector3(x, 0, z) / _pointsPerUnit,
@@ -147,6 +157,7 @@ public class DynamicGround : MonoBehaviour
         if (closestTrailPointIndex > 0)
         {
             _vertices[vertexIndex] = trailPoints[closestTrailPointIndex];
+            _verticesMoved[vertexIndex] = true;
             Debug.Log($"d={closestDistance}");
             Debug.DrawLine(
                 trailPoints[closestTrailPointIndex],
