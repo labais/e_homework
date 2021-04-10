@@ -66,4 +66,20 @@ public class MyMath
 
         return inside;
     }
+    
+    // https://stackoverflow.com/a/51906100/207757
+    public static Vector2 FindNearestPointOnLine(Vector2 origin, Vector2 end, Vector2 point)
+    {
+        //Get heading
+        Vector2 heading = (end - origin);
+        float magnitudeMax = heading.magnitude;
+        heading.Normalize();
+
+        //Do projection from the point but clamp it
+        Vector2 lhs = point - origin;
+        float dotP = Vector2.Dot(lhs, heading);
+        dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
+        return origin + heading * dotP;
+    }
+    
 }

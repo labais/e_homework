@@ -8,11 +8,12 @@ public class DynamicGround : MonoBehaviour
     [SerializeField, Tooltip("In Unity units")]
     private int xSize, zSize;
 
-    [FormerlySerializedAs("pointsPerUnit")] [SerializeField, Tooltip("Density")] private int _pointsPerUnit;
+    [FormerlySerializedAs("pointsPerUnit")] [SerializeField, Tooltip("Density")]
+    private int _pointsPerUnit;
 
     private int _xPoints, _zPoints;
     private Mesh _mesh;
-    private bool[,,] _skippedQuads; // x,y,z => is quad skipped 
+    private bool[,,] _skippedQuads; // x,y,z => is quad skipped  (coords are for quad's lower bottom corner)
 
     private Vector3[] _vertices;
 
@@ -24,83 +25,79 @@ public class DynamicGround : MonoBehaviour
         RegenerateMesh();
     }
 
-    public void UpdateGround(List<Vector3> trailPoints = null, int startIndex = 0)
+    public void UpdateGround(List<Vector3> trailPoints = null, int trailStartIndex = 0)
     {
         // Skip cubes intersected by cutting line
-        for (var i = startIndex; i < trailPoints.Count; i++)
+        for (var i = trailStartIndex; i < trailPoints.Count; i++)
         {
             var cubeX = (int) Mathf.Floor(trailPoints[i].x * _pointsPerUnit);
             var cubeZ = (int) Mathf.Floor(trailPoints[i].z * _pointsPerUnit);
             if (!_skippedQuads[cubeX, 0, cubeZ])
             {
                 _skippedQuads[cubeX, 0, cubeZ] = true;
-                Debug.DrawLine(
-                    (new Vector3(cubeX, 0, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
-                    (new Vector3(cubeX, 1, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
-                    Color.green,999);
+                // Debug.DrawLine(
+                //     (new Vector3(cubeX, 0, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                //     (new Vector3(cubeX, 1, cubeZ) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                //     Color.green,999);
             }
         }
-        
+
         // Find floating islands and drop them
-        int maxZ = _skippedQuads.GetLength(2);
-        int maxX = _skippedQuads.GetLength(0);
-        for (int z = 1; z < maxZ - 1; z++)
+        for (int z = 1; z < _xPoints - 1; z++)
         {
-            for (int x = 1; x < maxX - 1; x++)
+            for (int x = 1; x < _zPoints - 1; x++)
             {
-                if ( MyMath.ContainsPoint(trailPoints, startIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))  
+                if (MyMath.ContainsPoint(trailPoints, trailStartIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))
                 {
-                        _skippedQuads[x, 0, z] = true;
-                        Debug.DrawLine(
-                            (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
-                            (new Vector3(x, 2, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
-                            Color.yellow, 999);
+                    _skippedQuads[x, 0, z] = true;
+                    // Debug.DrawLine(
+                    //     (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                    //     (new Vector3(x, 2, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit,
+                    //     Color.yellow, 999);
                 }
             }
         }
 
-        RegenerateMesh();
+        RegenerateMesh(trailPoints, trailStartIndex);
     }
 
-    // find next hole to the right
-    private bool IsThisAnIslandX(int xStart, int z)
+    private void RegenerateMesh(List<Vector3> trailPoints = null, int trailStartIndex = 0)
     {
-        int maxX = _skippedQuads.GetLength(0);
-        for (int x = xStart+1; x < maxX - 1; x++)
+        if (_mesh == null)
         {
-            if (_skippedQuads[x, 0, z])
+            GetComponent<MeshFilter>().mesh = _mesh = new Mesh();
+            _mesh.name = "Procedural Grid";
+            _vertices = new Vector3[(_xPoints + 1) * (_zPoints + 1)];
+            for (int i = 0, z = 0; z <= _zPoints; z++)
             {
-                return true;
+                for (int x = 0; x <= _xPoints; x++, i++)
+                {
+                    _vertices[i] = new Vector3(x / (float) _pointsPerUnit, 0, z / (float) _pointsPerUnit);
+                }
             }
         }
 
-        return false;
-    }
-    
-    private bool IsThisAnIslandZ(int x, int zStart)
-    {
-        int maxZ = _skippedQuads.GetLength(2);
-        for (int z = zStart+1; z < maxZ - 1; z++)
-        {
-            if (_skippedQuads[x, 0, z])
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void RegenerateMesh()
-    {
-        GetComponent<MeshFilter>().mesh = _mesh = new Mesh();
-        _mesh.name = "Procedural Grid";
-        _vertices = new Vector3[(_xPoints + 1) * (_zPoints + 1)];
+        // Mess up generated grid vertices
         for (int i = 0, z = 0; z <= _zPoints; z++)
         {
             for (int x = 0; x <= _xPoints; x++, i++)
             {
-                _vertices[i] = new Vector3(x / (float) _pointsPerUnit, 0, z / (float) _pointsPerUnit);
+                if ((x > 0 && z > 0 && x < _xPoints && z < _zPoints))
+                {
+                    if (
+                        (_skippedQuads[x, 0, z] &&
+                         (!_skippedQuads[x, 0, z + 1] || !_skippedQuads[x, 0, z - 1] ||
+                          !_skippedQuads[x + 1, 0, z] || !_skippedQuads[x - 1, 0, z]
+                         )
+                        )
+                    )
+                    {
+                        DistortPoint(x, z, trailPoints, trailStartIndex);
+                        DistortPoint(x + 1, z, trailPoints, trailStartIndex);
+                        DistortPoint(x, z + 1, trailPoints, trailStartIndex);
+                        DistortPoint(x+1, z + 1, trailPoints, trailStartIndex);
+                    }
+                }
             }
         }
 
@@ -122,5 +119,41 @@ public class DynamicGround : MonoBehaviour
 
         _mesh.triangles = triangles;
         _mesh.RecalculateNormals();
+    }
+
+    // Move mesh point closer to the closest point OF the trail (good enaough not to calculate closest point ON the trail) 
+    private void DistortPoint(int x, int z, List<Vector3> trailPoints = null, int trailStartIndex = 0)
+    {
+        var vertexIndex = z * (_zPoints + 1) + x;
+
+        Debug.DrawLine(
+            new Vector3(x, 0, z) / _pointsPerUnit,
+            new Vector3(x, 2, z) / _pointsPerUnit,
+            Color.green, 999);
+
+        var vertexPoint = _vertices[vertexIndex];
+        var closestDistance = float.MaxValue;
+        var closestTrailPointIndex = -1;
+        for (var i = trailStartIndex+1; i < trailPoints.Count-1; i++)
+        {
+            var d = Vector3.Distance(vertexPoint, trailPoints[i]); 
+            if (d < closestDistance && d < (1.0/_pointsPerUnit) * 1.6f) // Consider moving only nearby points
+            {
+                closestDistance = d;
+                closestTrailPointIndex = i;
+            }
+        }
+
+        if (closestTrailPointIndex > 0)
+        {
+            _vertices[vertexIndex] = trailPoints[closestTrailPointIndex];
+            Debug.Log($"d={closestDistance}");
+            Debug.DrawLine(
+                trailPoints[closestTrailPointIndex],
+                trailPoints[closestTrailPointIndex] + Vector3.up * 2,
+                Color.yellow, 999);
+            
+        }
+        
     }
 }

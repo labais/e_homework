@@ -57,7 +57,7 @@ public class TrackBurner : MonoBehaviour
         // @note -- it would be better to use intersection point not [i] and [last], but hopefully no one will notice 
         for (var i = startIndex; i < _trailPoints.Count - 2; i++)
         {
-            Debug.DrawLine(_trailPoints[i] + DO2, _trailPoints[i + 1] + DO2, Color.red, 5);
+            Debug.DrawLine(_trailPoints[i] + DO2, _trailPoints[i + 1] + DO2, Color.red, 999);
         }
     }
 
