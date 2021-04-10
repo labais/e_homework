@@ -28,6 +28,7 @@ public class DynamicGround : MonoBehaviour
 
     public void UpdateGround(List<Vector3> trailPoints = null, int trailStartIndex = 0)
     {
+        // Debug.Log($"update ground num={trailPoints.Count} trailStartIndex={trailStartIndex}");
         // Skip cubes intersected by cutting line
         for (var i = trailStartIndex; i < trailPoints.Count; i++)
         {
@@ -44,9 +45,9 @@ public class DynamicGround : MonoBehaviour
         }
 
         // Find floating islands and drop them
-        for (int z = 1; z < _xPoints - 1; z++)
+        for (int z = 1; z < _zPoints - 1; z++)
         {
-            for (int x = 1; x < _zPoints - 1; x++)
+            for (int x = 1; x < _xPoints - 1; x++)
             {
                 if (MyMath.ContainsPoint(trailPoints, trailStartIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))
                 {
@@ -86,18 +87,16 @@ public class DynamicGround : MonoBehaviour
             {
                 if ((x > 0 && z > 0 && x < _xPoints && z < _zPoints))
                 {
-                    if (
-                        (_skippedQuads[x, 0, z] &&
-                         (!_skippedQuads[x, 0, z + 1] || !_skippedQuads[x, 0, z - 1] ||
-                          !_skippedQuads[x + 1, 0, z] || !_skippedQuads[x - 1, 0, z]
-                         )
+                    if (_skippedQuads[x, 0, z] &&
+                        (!_skippedQuads[x, 0, z + 1] || !_skippedQuads[x, 0, z - 1] ||
+                         !_skippedQuads[x + 1, 0, z] || !_skippedQuads[x - 1, 0, z]
                         )
                     )
                     {
                         DistortPoint(x, z, trailPoints, trailStartIndex);
                         DistortPoint(x + 1, z, trailPoints, trailStartIndex);
                         DistortPoint(x, z + 1, trailPoints, trailStartIndex);
-                        DistortPoint(x+1, z + 1, trailPoints, trailStartIndex);
+                        DistortPoint(x + 1, z + 1, trailPoints, trailStartIndex);
                     }
                 }
             }
@@ -126,14 +125,14 @@ public class DynamicGround : MonoBehaviour
     // Move mesh point closer to the closest point OF the trail (good enaough not to calculate closest point ON the trail) 
     private void DistortPoint(int x, int z, List<Vector3> trailPoints = null, int trailStartIndex = 0)
     {
-        var vertexIndex = z * (_zPoints + 1) + x;
+        var vertexIndex = z * (_xPoints + 1) + x;
         if (_verticesMoved[vertexIndex]) // Leave already moved ones alone!
         {
             Debug.DrawLine(
                 new Vector3(x, 0, z) / _pointsPerUnit,
                 new Vector3(x, 2, z) / _pointsPerUnit,
                 Color.black, 999);
-            return; 
+            return;
         }
 
         Debug.DrawLine(
@@ -144,10 +143,10 @@ public class DynamicGround : MonoBehaviour
         var vertexPoint = _vertices[vertexIndex];
         var closestDistance = float.MaxValue;
         var closestTrailPointIndex = -1;
-        for (var i = trailStartIndex+1; i < trailPoints.Count-1; i++)
+        for (var i = trailStartIndex + 1; i < trailPoints.Count - 1; i++)
         {
-            var d = Vector3.Distance(vertexPoint, trailPoints[i]); 
-            if (d < closestDistance && d < (1.0/_pointsPerUnit) * 1.6f) // Consider moving only nearby points
+            var d = Vector3.Distance(vertexPoint, trailPoints[i]);
+            if (d < closestDistance && d < (1.0 / _pointsPerUnit) * 1.6f) // Consider moving only nearby points
             {
                 closestDistance = d;
                 closestTrailPointIndex = i;
@@ -158,13 +157,11 @@ public class DynamicGround : MonoBehaviour
         {
             _vertices[vertexIndex] = trailPoints[closestTrailPointIndex];
             _verticesMoved[vertexIndex] = true;
-            Debug.Log($"d={closestDistance}");
+            // Debug.Log($"d={closestDistance}");
             Debug.DrawLine(
                 trailPoints[closestTrailPointIndex],
                 trailPoints[closestTrailPointIndex] + Vector3.up * 2,
                 Color.yellow, 999);
-            
         }
-        
     }
 }
