@@ -40,7 +40,7 @@ public class TrackBurner : MonoBehaviour
 
         for (var i = 0; i < _trailPoints.Count - 2; i++)
         {
-            if (MyMath.AreLinesIntersecting(_trailPoints[i], _trailPoints[i + 1], penultimatePoint, newPoint))
+            if (MyMaths.AreLinesIntersecting(_trailPoints[i], _trailPoints[i + 1], penultimatePoint, newPoint))
             {
                 _dynamicGround.UpdateGround(_trailPoints, i);
                 DrawArea(i);

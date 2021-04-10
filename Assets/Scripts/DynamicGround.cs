@@ -16,13 +16,19 @@ public class DynamicGround : MonoBehaviour
     private bool[,,] _skippedQuads; // x,y,z => is quad skipped  (coords are for quad's lower bottom corner)
 
     private Vector3[] _vertices;
+    private Vector2[] _uv;
     private bool[] _verticesMoved; // To make sure only vertex is moved only once
+    
 
     private void Start()
     {
         _xPoints = xSize * _pointsPerUnit;
         _zPoints = zSize * _pointsPerUnit;
         _skippedQuads = new bool[_xPoints, 1, _zPoints];
+        
+      //  var mat = GetComponent<Renderer>().material;
+        // mat.mainTextureScale = Vector2();
+        
         RegenerateMesh();
     }
 
@@ -49,7 +55,7 @@ public class DynamicGround : MonoBehaviour
         {
             for (int x = 1; x < _xPoints - 1; x++)
             {
-                if (MyMath.ContainsPoint(trailPoints, trailStartIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))
+                if (MyMaths.ContainsPoint(trailPoints, trailStartIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))
                 {
                     _skippedQuads[x, 0, z] = true;
                     // Debug.DrawLine(
@@ -70,12 +76,14 @@ public class DynamicGround : MonoBehaviour
             GetComponent<MeshFilter>().mesh = _mesh = new Mesh();
             _mesh.name = "Procedural Grid";
             _vertices = new Vector3[(_xPoints + 1) * (_zPoints + 1)];
+            _uv = new Vector2[(_xPoints + 1) * (_zPoints + 1)];
             _verticesMoved = new bool[(_xPoints + 1) * (_zPoints + 1)];
             for (int i = 0, z = 0; z <= _zPoints; z++)
             {
                 for (int x = 0; x <= _xPoints; x++, i++)
                 {
                     _vertices[i] = new Vector3(x / (float) _pointsPerUnit, 0, z / (float) _pointsPerUnit);
+                    _uv[i] = new Vector2(x / (float)_xPoints, z / (float)_zPoints);
                 }
             }
         }
@@ -99,10 +107,15 @@ public class DynamicGround : MonoBehaviour
                         DistortPoint(x + 1, z + 1, trailPoints, trailStartIndex);
                     }
                 }
+                
+                // recalculate all UV's, some points are moved 
+                var vertexIndex = z * (_xPoints + 1) + x;
+                _uv[vertexIndex] =  MyMaths.squashVector(_vertices[vertexIndex]);
             }
         }
 
         _mesh.vertices = _vertices;
+        _mesh.uv = _uv;
 
         int[] triangles = new int[_xPoints * _zPoints * 6];
         for (int ti = 0, vi = 0, z = 0; z < _zPoints; z++, vi++)
@@ -120,6 +133,7 @@ public class DynamicGround : MonoBehaviour
 
         _mesh.triangles = triangles;
         _mesh.RecalculateNormals();
+        
     }
 
     // Move mesh point closer to the closest point OF the trail (good enaough not to calculate closest point ON the trail) 
