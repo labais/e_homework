@@ -50,7 +50,7 @@ public class DynamicGround : MonoBehaviour
 
         var h = 2;
         _finish.localPosition = new Vector3(xSize / 2f, -(h/2) + .17f, zSize - 2f);
-        _wallRight.localScale = new Vector3(1, h, 1);
+        _finish.localScale = new Vector3(5, h, 2);
     }
 
     public void UpdateGround(List<Vector3> shapePoints = null)

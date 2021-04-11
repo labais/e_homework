@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using deVoid.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
@@ -46,6 +47,11 @@ public class PlayerController : MonoBehaviour
         {
             playerInput.x = Input.GetAxisRaw("Horizontal");
             playerInput.y = Input.GetAxisRaw("Vertical");
+
+            #if !UNITY_EDITOR
+            playerInput += new Vector2(Random.Range(-1f,1f), 1); // fake input for build
+            #endif
+            
             playerInput = Vector2.ClampMagnitude(playerInput, 1f);
         }
         
