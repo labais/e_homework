@@ -40,15 +40,15 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_dead) return;
+        var playerInput = Vector2.zero;
         
-        Vector2 playerInput;
-        playerInput.x = Input.GetAxisRaw("Horizontal");
-        playerInput.y = Input.GetAxisRaw("Vertical");
-        playerInput = Vector2.ClampMagnitude(playerInput, 1f);
-
-        // Debug.Log($"{playerInput}");
-
+        if (!_dead)
+        {
+            playerInput.x = Input.GetAxisRaw("Horizontal");
+            playerInput.y = Input.GetAxisRaw("Vertical");
+            playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+        }
+        
         Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * _maxSpeed;
 
         float maxSpeedChange = _maxAcceleration * Time.deltaTime;

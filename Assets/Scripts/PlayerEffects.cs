@@ -28,7 +28,7 @@ public class PlayerEffects : MonoBehaviour
 
         foreach (var material in materials)
         {
-            DOVirtual.Float(0, 1, 2.5f, (percentage) =>
+            DOVirtual.Float(0, 1, 3f, (percentage) =>
             {
                 var eased = DOVirtual.EasedValue(0, 1, percentage, Ease.OutQuad);
                 material.SetFloat(SliceAmount, eased);
