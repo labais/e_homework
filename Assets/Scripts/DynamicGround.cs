@@ -17,6 +17,7 @@ public class DynamicGround : MonoBehaviour
     [SerializeField] private Transform _wallTop;
     [SerializeField] private Transform _wallLeft;
     [SerializeField] private Transform _wallRight;
+    [SerializeField] private Transform _finish;
 
     private int _xPoints, _zPoints;
     private Mesh _mesh;
@@ -46,6 +47,8 @@ public class DynamicGround : MonoBehaviour
 
         _wallRight.localPosition = new Vector3(xSize + .5f, 0, zSize / 2f);
         _wallRight.localScale = new Vector3(1, 1, zSize + 1);
+        
+        _finish.localPosition = new Vector3(xSize / 2f, -0.46f, zSize -2f);
     }
 
     public void UpdateGround(List<Vector3> shapePoints = null)

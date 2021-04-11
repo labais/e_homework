@@ -14,6 +14,15 @@ public class PlayerCollisionChecker : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.LogError($"PlayerCollisionChecker::got {other.name}");
+        if (other.CompareTag("Finish"))
+        {
+            Debug.LogError($"PlayerCollisionChecker::FINISHED!");
+        }
+        else
+        {
+            Debug.LogError($"PlayerCollisionChecker::player's dead, prolly");
+        }
+
+        
     }
 }
