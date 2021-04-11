@@ -5,16 +5,25 @@ public class CameraShake : MonoBehaviour
 {
     [SerializeField] private float _shakeMagnitude = 0.1f;
     [SerializeField] private float _dampingSpeed = 1.0f;
-    
+
     private Transform _transform;
     private float _shakeDuration;
     Vector3 _initialPosition;
+
+    void OnEnable()
+    {
+        Signals.Get<ShakeCameraSignal>().AddListener(OnShakeCamera);
+    }
+
+    void OnDisable()
+    {
+        Signals.Get<ShakeCameraSignal>().RemoveListener(OnShakeCamera);
+    }
 
     private void Start()
     {
         _transform = transform;
         _initialPosition = _transform.localPosition;
-        Signals.Get<ShakeCameraSignal>().AddListener(OnShakeCamera); 
     }
 
     void FixedUpdate()

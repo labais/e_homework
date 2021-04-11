@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class HoleAnimator : MonoBehaviour
 {
+    private static readonly int SliceAmount = Shader.PropertyToID("_SliceAmount");
+
     void OnEnable()
     {
         Signals.Get<HoleGeneratedSignal>().AddListener(OnHoleGenerated);
@@ -31,7 +33,6 @@ public class HoleAnimator : MonoBehaviour
 
         var shapeLength = MyMaths.ShapeLength(hole.GetComponent<MeshFilter>().mesh.vertices);
      
-        
         const float minL = 2;
         const float maxL = 25;
         var lenghtBonus = 1 + (Mathf.Clamp01((shapeLength - minL) / (maxL - minL)) * .5f);
@@ -52,14 +53,11 @@ public class HoleAnimator : MonoBehaviour
         });
         sequence.AppendCallback(() =>
         {
-            // StartCoroutine(Dissolve(hole));
-
-            //DOVirtual.EasedValue(0, 1, t, Ease.InOutCirc);
             var mat = hole.GetComponent<Renderer>().material;
             DOVirtual.Float(.05f, 1, 2.5f, (percentage) =>
             {
                 var eased = DOVirtual.EasedValue(0, 1, percentage, Ease.OutQuad);
-                mat.SetFloat("_SliceAmount", eased);
+                mat.SetFloat(SliceAmount, eased);
             });
         });
     }

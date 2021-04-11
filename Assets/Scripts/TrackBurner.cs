@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using deVoid.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,17 +15,31 @@ public class TrackBurner : MonoBehaviour
     private readonly List<Vector3> _trailPoints = new List<Vector3>();
     private readonly List<DateTime> _trailTimes = new List<DateTime>();
     private Vector3 _lastPoint;
-
+    private bool _finished;
+    
     private readonly Vector3 DO = Vector3.up; // Debug Offset for vector drawing
     private readonly Vector3 DO2 = Vector3.up * 0.1f;
+    
 
     private void Start()
     {
         AddPointAndCheckIfCrossed(transform.position);
     }
 
+    void OnEnable()
+    {
+        Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
+    }
+
+    void OnDisable()
+    {
+        Signals.Get<PlayerFinishedSignal>().RemoveListener(OnPlayerFinished);
+    }
+    
     void FixedUpdate()
     {
+        if (_finished) return;
+        
         if (_lastPoint != transform.position)
         {
             _lastPoint = transform.position;
@@ -99,5 +114,10 @@ public class TrackBurner : MonoBehaviour
         }
 
         // Debug.Log($"CutTailAtIndex::num={cutoffIndex}");
+    }
+
+    private void OnPlayerFinished()
+    {
+        _finished = true;
     }
 }

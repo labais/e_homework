@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using deVoid.Utils;
 using UnityEngine;
 
 public class PlayerCollisionChecker : MonoBehaviour
@@ -16,11 +17,13 @@ public class PlayerCollisionChecker : MonoBehaviour
     {
         if (other.CompareTag("Finish"))
         {
-            Debug.LogError($"PlayerCollisionChecker::FINISHED!");
+            Debug.Log($"PlayerCollisionChecker::FINISHED!");
+            Signals.Get<PlayerFinishedSignal>().Dispatch();
         }
         else
         {
-            Debug.LogError($"PlayerCollisionChecker::player's dead, prolly");
+            Debug.Log($"PlayerCollisionChecker::player's dead, prolly");
+            Signals.Get<PlayerDiedSignal>().Dispatch();
         }
 
         

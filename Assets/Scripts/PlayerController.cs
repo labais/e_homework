@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using deVoid.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -20,15 +21,27 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 _velocity;
     private Transform _transform;
-    
+    private bool _dead;
 
     private void Start()
     {
         _transform = transform;
     }
 
+    void OnEnable()
+    {
+        Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
+    }
+
+    void OnDisable()
+    {
+        Signals.Get<PlayerDiedSignal>().RemoveListener(OnPlayerDied);
+    }
+
     private void FixedUpdate()
     {
+        if (_dead) return;
+        
         Vector2 playerInput;
         playerInput.x = Input.GetAxisRaw("Horizontal");
         playerInput.y = Input.GetAxisRaw("Vertical");
@@ -45,26 +58,13 @@ public class PlayerController : MonoBehaviour
         Vector3 displacement = _velocity * Time.deltaTime;
         Vector3 newPosition = _transform.localPosition + displacement;
 
-        // if (newPosition.x < allowedArea.xMin) {
-        //     newPosition.x = allowedArea.xMin;
-        //     velocity.x = -velocity.x * bounciness;
-        // }
-        // else if (newPosition.x > allowedArea.xMax) {
-        //     newPosition.x = allowedArea.xMax;
-        //     velocity.x = -velocity.x * bounciness;
-        // }
-        // if (newPosition.z < allowedArea.yMin) {
-        //     newPosition.z = allowedArea.yMin;
-        //     velocity.z = -velocity.z * bounciness;
-        // }
-        // else if (newPosition.z > allowedArea.yMax) {
-        //     newPosition.z = allowedArea.yMax;
-        //     velocity.z = -velocity.z * bounciness;
-        // }
-
-
         _transform.localPosition = newPosition;
-      
+
         _stickContainer.eulerAngles = new Vector3(_velocity.z / _maxSpeed * _maxStickAngle, 0, _velocity.x / _maxSpeed * _maxStickAngle);
+    }
+
+    private void OnPlayerDied()
+    {
+        _dead = true;
     }
 }
