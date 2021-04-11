@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using deVoid.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -10,15 +11,15 @@ public class DynamicGround : MonoBehaviour
     private int xSize, zSize;
 
     [SerializeField, Tooltip("Density")] private int _pointsPerUnit;
-    [SerializeField,] private Transform _dynamicHolePrefab;
-    [SerializeField,] private Transform _dynamicHoleWallPrefab;
+    [SerializeField] private Transform _dynamicHolePrefab;
+    [SerializeField] private Transform _dynamicHoleWallPrefab;
 
     private int _xPoints, _zPoints;
     private Mesh _mesh;
     private bool[,,] _skippedQuads; // x,y,z => is quad skipped  (coords are for quad's lower bottom corner)
     private Vector3[] _vertices;
     private Vector2[] _uv;
-    private bool[] _verticesMoved; // To make sure only vertex is moved only once
+    private bool[] _verticesMoved; // To make sure the vertex is moved only once
     private int _holeId;
 
     private void Start()
@@ -26,10 +27,6 @@ public class DynamicGround : MonoBehaviour
         _xPoints = xSize * _pointsPerUnit;
         _zPoints = zSize * _pointsPerUnit;
         _skippedQuads = new bool[_xPoints, 1, _zPoints];
-
-        //  var mat = GetComponent<Renderer>().material;
-        // mat.mainTextureScale = Vector2();
-
         _dynamicHolePrefab.gameObject.SetActive(false);
         _dynamicHoleWallPrefab.gameObject.SetActive(false);
         RegenerateMesh();
@@ -70,8 +67,11 @@ public class DynamicGround : MonoBehaviour
 
         RegenerateMesh(shapePoints);
 
-        CreateHoleObject(shapePoints);
-        CreateHoleWallObject(shapePoints);
+        var hole = CreateHoleObject(shapePoints);
+        var walls = CreateHoleWallObject(shapePoints);
+        
+        Signals.Get<HoleGeneratedSignal>().Dispatch(hole, walls);
+        
         _holeId++;
     }
 
@@ -184,7 +184,7 @@ public class DynamicGround : MonoBehaviour
         }
     }
 
-    private void CreateHoleObject(List<Vector3> shapePoints)
+    private Transform CreateHoleObject(List<Vector3> shapePoints)
     {
         var startIndex = 1;
         var endIndex = shapePoints.Count - 1;
@@ -193,7 +193,6 @@ public class DynamicGround : MonoBehaviour
         Mesh mesh;
 
         var hole = Instantiate(_dynamicHolePrefab, Vector3.zero, Quaternion.identity, transform);
-        hole.gameObject.SetActive(true);
         hole.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
         hole.gameObject.name = mesh.name = $"Hole{_holeId}";
         var num = endIndex - startIndex;
@@ -221,12 +220,14 @@ public class DynamicGround : MonoBehaviour
                 // HAXXX: if you retrace your steps and finish a shape, it comes out all messed up, this kind of helps
                 // Debug.Log("Fixed inverse hole");
                 MyMaths.InverseTriangles(mesh);
-                return;
+                break;
             }
         }
+
+        return hole;
     }
 
-    private void CreateHoleWallObject(List<Vector3> shapePoints = null)
+    private Transform CreateHoleWallObject(List<Vector3> shapePoints = null)
     {
         var centerOfMass = MyMaths.CenterOfVectors(shapePoints);
         for (var i = 0; i < shapePoints.Count; i++)
@@ -235,18 +236,15 @@ public class DynamicGround : MonoBehaviour
             shapePoints[i] = shapePoints[i] - centerOfMass;
         }
 
-        Debug.Log($"centerOfMass={centerOfMass}");
-
         var startIndex = 1;
         var endIndex = shapePoints.Count - 1;
         Vector3[] vertices;
         Vector2[] uv;
         Mesh mesh;
 
-        var hole = Instantiate(_dynamicHoleWallPrefab, centerOfMass, Quaternion.identity, transform);
-        hole.gameObject.SetActive(true);
-        hole.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
-        hole.gameObject.name = mesh.name = $"HoleWall{_holeId}";
+        var holeWalls = Instantiate(_dynamicHoleWallPrefab, centerOfMass, Quaternion.identity, transform);
+        holeWalls.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
+        holeWalls.gameObject.name = mesh.name = $"HoleWall{_holeId}";
         var num = endIndex - startIndex;
         vertices = new Vector3[num * 2];
         uv = new Vector2[num * 2];
@@ -295,5 +293,7 @@ public class DynamicGround : MonoBehaviour
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
+        
+        return holeWalls;
     }
 }
