@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -44,7 +45,20 @@ public class TrackBurner : MonoBehaviour
         {
             if (MyMaths.AreLinesIntersecting(_trailPoints[i], _trailPoints[i + 1], penultimatePoint, newPoint))
             {
-                _dynamicGround.UpdateGround(_trailPoints, i);
+               var shapePoints =  _trailPoints.Skip(i).ToList();
+
+               if (MyMaths.IsClockwise(shapePoints))
+               {
+                    Debug.Log("was CW");
+                    shapePoints.Reverse();
+               }
+               else
+               {
+                   Debug.Log("was CCW");   
+               }
+
+
+               _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
                 CutTailAtIndex(i);
                 return;

@@ -58,14 +58,14 @@ public class MyMaths
     }
 
     // https://wiki.unity3d.com/index.php/PolyContainsPoint
-    public static bool ContainsPoint(List<Vector3> trailPoints, int startIndex, Vector3 p)
+    public static bool ContainsPoint(List<Vector3> shapePoints, Vector3 p)
     {
-        var j = trailPoints.Count - 1;
+        var j = shapePoints.Count - 1;
         var inside = false;
-        for (int i = startIndex; i < trailPoints.Count; j = i++)
+        for (int i = 0; i < shapePoints.Count; j = i++)
         {
-            var pi = trailPoints[i];
-            var pj = trailPoints[j];
+            var pi = shapePoints[i];
+            var pj = shapePoints[j];
             if (((pi.z <= p.z && p.z < pj.z) || (pj.z <= p.z && p.z < pi.z)) && (p.x < (pj.x - pi.x) * (p.z - pi.z) / (pj.z - pi.z) + pi.x)) inside = !inside;
         }
 
@@ -85,5 +85,19 @@ public class MyMaths
         float dotP = Vector2.Dot(lhs, heading);
         dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
         return origin + heading * dotP;
+    }
+
+    // https://stackoverflow.com/a/18472899/207757
+    public static bool IsClockwise(IList<Vector3> vertices)
+    {
+        var sum = 0.0;
+        for (var i = 0; i < vertices.Count; i++)
+        {
+            var v1 = vertices[i];
+            var v2 = vertices[(i + 1) % vertices.Count];
+            sum += (v2.x - v1.x) * (v2.z + v1.z);
+        }
+
+        return sum > 0.0;
     }
 }

@@ -10,6 +10,7 @@ public class DynamicGround : MonoBehaviour
 
     [SerializeField, Tooltip("Density")] private int _pointsPerUnit;
     [SerializeField,] private Transform _dynamicHolePrefab;
+    [SerializeField,] private Transform _dynamicHoleWallPrefab;
 
     private int _xPoints, _zPoints;
     private Mesh _mesh;
@@ -29,17 +30,17 @@ public class DynamicGround : MonoBehaviour
         // mat.mainTextureScale = Vector2();
 
         _dynamicHolePrefab.gameObject.SetActive(false);
+        _dynamicHoleWallPrefab.gameObject.SetActive(false);
         RegenerateMesh();
     }
 
-    public void UpdateGround(List<Vector3> trailPoints = null, int trailStartIndex = 0)
+    public void UpdateGround(List<Vector3> shapePoints = null)
     {
-        // Debug.Log($"update ground num={trailPoints.Count} trailStartIndex={trailStartIndex}");
         // Skip cubes intersected by cutting line
-        for (var i = trailStartIndex; i < trailPoints.Count; i++)
+        for (var i = 0; i < shapePoints.Count; i++)
         {
-            var cubeX = (int) Mathf.Floor(trailPoints[i].x * _pointsPerUnit);
-            var cubeZ = (int) Mathf.Floor(trailPoints[i].z * _pointsPerUnit);
+            var cubeX = (int) Mathf.Floor(shapePoints[i].x * _pointsPerUnit);
+            var cubeZ = (int) Mathf.Floor(shapePoints[i].z * _pointsPerUnit);
             if (!_skippedQuads[cubeX, 0, cubeZ])
             {
                 _skippedQuads[cubeX, 0, cubeZ] = true;
@@ -55,7 +56,7 @@ public class DynamicGround : MonoBehaviour
         {
             for (int x = 1; x < _xPoints - 1; x++)
             {
-                if (MyMaths.ContainsPoint(trailPoints, trailStartIndex, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))
+                if (MyMaths.ContainsPoint(shapePoints, (new Vector3(x, 0, z) + Vector3.forward * .5f + Vector3.right * .5f) / _pointsPerUnit))
                 {
                     _skippedQuads[x, 0, z] = true;
                     // Debug.DrawLine(
@@ -66,11 +67,14 @@ public class DynamicGround : MonoBehaviour
             }
         }
 
-        RegenerateMesh(trailPoints, trailStartIndex);
-        CreateHoleObject(trailPoints, trailStartIndex);
+        RegenerateMesh(shapePoints);
+
+        CreateHoleObject(shapePoints);
+        CreateHoleWallObject(shapePoints);
+        _holeId++;
     }
 
-    private void RegenerateMesh(List<Vector3> trailPoints = null, int trailStartIndex = 0)
+    private void RegenerateMesh(List<Vector3> shapePoints = null)
     {
         if (_mesh == null)
         {
@@ -102,10 +106,10 @@ public class DynamicGround : MonoBehaviour
                         )
                     )
                     {
-                        DistortPoint(x, z, trailPoints, trailStartIndex);
-                        DistortPoint(x + 1, z, trailPoints, trailStartIndex);
-                        DistortPoint(x, z + 1, trailPoints, trailStartIndex);
-                        DistortPoint(x + 1, z + 1, trailPoints, trailStartIndex);
+                        DistortPoint(x, z, shapePoints);
+                        DistortPoint(x + 1, z, shapePoints);
+                        DistortPoint(x, z + 1, shapePoints);
+                        DistortPoint(x + 1, z + 1, shapePoints);
                     }
                 }
 
@@ -137,7 +141,7 @@ public class DynamicGround : MonoBehaviour
     }
 
     // Move mesh point closer to the closest point OF the trail (good enaough not to calculate closest point ON the trail) 
-    private void DistortPoint(int x, int z, List<Vector3> trailPoints = null, int trailStartIndex = 0)
+    private void DistortPoint(int x, int z, List<Vector3> shapePoints = null)
     {
         var vertexIndex = z * (_xPoints + 1) + x;
         if (_verticesMoved[vertexIndex]) // Leave already moved ones alone!
@@ -157,9 +161,9 @@ public class DynamicGround : MonoBehaviour
         var vertexPoint = _vertices[vertexIndex];
         var closestDistance = float.MaxValue;
         var closestTrailPointIndex = -1;
-        for (var i = trailStartIndex + 1; i < trailPoints.Count - 1; i++)
+        for (var i = 1; i < shapePoints.Count - 1; i++)
         {
-            var d = Vector3.Distance(vertexPoint, trailPoints[i]);
+            var d = Vector3.Distance(vertexPoint, shapePoints[i]);
             if (d < closestDistance && d < (1.0 / _pointsPerUnit) * 1.6f) // Consider moving only nearby points
             {
                 closestDistance = d;
@@ -169,7 +173,7 @@ public class DynamicGround : MonoBehaviour
 
         if (closestTrailPointIndex > 0)
         {
-            _vertices[vertexIndex] = trailPoints[closestTrailPointIndex];
+            _vertices[vertexIndex] = shapePoints[closestTrailPointIndex];
             _verticesMoved[vertexIndex] = true;
             // Debug.Log($"d={closestDistance}");
             // Debug.DrawLine(
@@ -179,10 +183,10 @@ public class DynamicGround : MonoBehaviour
         }
     }
 
-    private void CreateHoleObject(List<Vector3> trailPoints = null, int trailStartIndex = 0)
+    private void CreateHoleObject(List<Vector3> shapePoints = null)
     {
-        var startIndex = trailStartIndex + 1;
-        var endIndex = trailPoints.Count - 1;
+        var startIndex = 1;
+        var endIndex = shapePoints.Count - 1;
         Vector3[] vertices;
         Vector2[] uv;
         Mesh mesh;
@@ -190,18 +194,16 @@ public class DynamicGround : MonoBehaviour
         var hole = Instantiate(_dynamicHolePrefab, Vector3.zero, Quaternion.identity, transform);
         hole.gameObject.SetActive(true);
         hole.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
-        mesh.name = $"Procedural Hole {_holeId}";
+        hole.gameObject.name = mesh.name = $"Hole{_holeId}";
         var num = endIndex - startIndex;
         vertices = new Vector3[num];
         uv = new Vector2[num];
 
         for (int i = startIndex, k = 0; i < endIndex; i++, k++)
         {
-            vertices[k] = trailPoints[i];
+            vertices[k] = shapePoints[i];
             uv[k] = MyMaths.squashVector(vertices[k]);
         }
-
-      
 
         mesh.vertices = vertices;
         mesh.uv = uv;
@@ -209,17 +211,61 @@ public class DynamicGround : MonoBehaviour
         var triangulator = new Triangulator(vertices);
         mesh.triangles = triangulator.Triangulate();
         mesh.RecalculateNormals();
-        //
-        // Vector3[] normals = mesh.normals;
-        //
-        // for (var i = 0; i < normals.Length; i++)
-        // {
-        //     Debug.Log($"_holeId={_holeId} {normals[i]}");
-        //     normals[i] = Vector3.up;
-        // }
-        //
-        // mesh.normals = normals;
+    }
 
-        _holeId++;
+    private void CreateHoleWallObject(List<Vector3> shapePoints = null)
+    {
+        var startIndex = 1;
+        var endIndex = shapePoints.Count - 1;
+        Vector3[] vertices;
+        Vector2[] uv;
+        Mesh mesh;
+
+        var hole = Instantiate(_dynamicHoleWallPrefab, Vector3.zero, Quaternion.identity, transform);
+        hole.gameObject.SetActive(true);
+        hole.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
+        hole.gameObject.name = mesh.name = $"HoleWall{_holeId}";
+        var num = endIndex - startIndex;
+        vertices = new Vector3[num * 2];
+        uv = new Vector2[num * 2];
+
+        int[] triangles = new int[(num + 1) * 6 * 2];
+
+        // Triangulate band
+        var t = 0;
+        for (int i = startIndex, k = 0; i < endIndex; i++, k++)
+        {
+            vertices[k] = shapePoints[i] + Vector3.up;
+            vertices[k + num] = shapePoints[i]; // + Vector3.down;
+            uv[k] = MyMaths.squashVector(vertices[k]); // @todo -- wallpaper that bad boi
+            uv[k + num] = MyMaths.squashVector(vertices[k + num]);
+
+            if (i < endIndex - 1)
+            {
+                // CW
+                triangles[t++] = k;
+                triangles[t++] = k + 1;
+                triangles[t++] = k + num;
+
+                triangles[t++] = k + 1;
+                triangles[t++] = k + 1 + num;
+                triangles[t++] = k + num;
+            }
+            else // Connecting start to end
+            {
+                triangles[t++] = k;
+                triangles[t++] = 0;
+                triangles[t++] = k + num;
+                
+                triangles[t++] = 0;
+                triangles[t++] = num;
+                triangles[t++] = k + num;
+            }
+        }
+
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
     }
 }
