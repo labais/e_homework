@@ -348,32 +348,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b895abf2d2f843e89c8476fd35b0207e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shakeDuration: 0
   _shakeMagnitude: 0.7
   _dampingSpeed: 1
---- !u!1 &1731904064 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5270593721470150851, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-  m_PrefabInstance: {fileID: 5270593723097098883}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1731904065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1731904064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee3d9c95b8e184d45a34a31463d7d42a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1731904066 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5270593721470150849, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
   m_PrefabInstance: {fileID: 5270593723097098883}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1731904064}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d8390edbbbe7a440a29ae6fdc877d63, type: 3}
@@ -520,6 +502,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!96 &2082962736 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 5408341691419860884, guid: 1db16557ce833ac4c8980b51097349b6, type: 3}
+  m_PrefabInstance: {fileID: 6831263131516406111}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5270593723097098883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -588,6 +575,10 @@ PrefabInstance:
       propertyPath: _dynamicGround
       value: 
       objectReference: {fileID: 1731904066}
+    - target: {fileID: 6831263131975148792, guid: 1db16557ce833ac4c8980b51097349b6, type: 3}
+      propertyPath: _trailRenderer
+      value: 
+      objectReference: {fileID: 2082962736}
     - target: {fileID: 6831263131975148793, guid: 1db16557ce833ac4c8980b51097349b6, type: 3}
       propertyPath: m_RootOrder
       value: 3

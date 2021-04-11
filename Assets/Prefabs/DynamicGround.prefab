@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5270593721470150855}
   - component: {fileID: 5270593721470150848}
   - component: {fileID: 5270593721470150849}
+  - component: {fileID: 1731904065}
   m_Layer: 0
   m_Name: DynamicGround
   m_TagString: Untagged
@@ -101,6 +102,18 @@ MonoBehaviour:
   _pointsPerUnit: 6
   _dynamicHolePrefab: {fileID: 5270593721809988238}
   _dynamicHoleWallPrefab: {fileID: 5270593722315572919}
+--- !u!114 &1731904065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5270593721470150851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee3d9c95b8e184d45a34a31463d7d42a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5270593721809988239
 GameObject:
   m_ObjectHideFlags: 0

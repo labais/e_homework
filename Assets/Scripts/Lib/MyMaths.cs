@@ -131,4 +131,15 @@ public class MyMaths
 
         return sum / vectors.Count;
     }
+
+    public static float ShapeLength(Vector3[] vectors)
+    {
+        var d = 0f;
+        for(var i = 0; i < vectors.Length-1; i++)
+        {
+            d += Vector3.Distance(vectors[i], vectors[i + 1]);
+        }
+
+        return d;
+    }
 }
