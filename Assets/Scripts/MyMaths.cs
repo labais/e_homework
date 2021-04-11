@@ -46,6 +46,11 @@ public class MyMaths
         return isIntersecting;
     }
 
+    public static bool IsCBetweenAB(Vector3 A, Vector3 B, Vector3 C)
+    {
+        return Vector3.Dot((B - A).normalized, (C - B).normalized) < 0f && Vector3.Dot((A - B).normalized, (C - A).normalized) < 0f;
+    }
+
     // From XZ plane uz XY plane
     public static Vector3 squashVector(Vector3 v3)
     {
@@ -66,7 +71,7 @@ public class MyMaths
 
         return inside;
     }
-    
+
     // https://stackoverflow.com/a/51906100/207757
     public static Vector2 FindNearestPointOnLine(Vector2 origin, Vector2 end, Vector2 point)
     {
@@ -81,5 +86,4 @@ public class MyMaths
         dotP = Mathf.Clamp(dotP, 0f, magnitudeMax);
         return origin + heading * dotP;
     }
-    
 }

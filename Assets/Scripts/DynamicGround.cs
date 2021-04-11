@@ -8,27 +8,27 @@ public class DynamicGround : MonoBehaviour
     [SerializeField, Tooltip("In Unity units")]
     private int xSize, zSize;
 
-    [FormerlySerializedAs("pointsPerUnit")] [SerializeField, Tooltip("Density")]
-    private int _pointsPerUnit;
+    [SerializeField, Tooltip("Density")] private int _pointsPerUnit;
+    [SerializeField,] private Transform _dynamicHolePrefab;
 
     private int _xPoints, _zPoints;
     private Mesh _mesh;
     private bool[,,] _skippedQuads; // x,y,z => is quad skipped  (coords are for quad's lower bottom corner)
-
     private Vector3[] _vertices;
     private Vector2[] _uv;
     private bool[] _verticesMoved; // To make sure only vertex is moved only once
-    
+    private int _holeId;
 
     private void Start()
     {
         _xPoints = xSize * _pointsPerUnit;
         _zPoints = zSize * _pointsPerUnit;
         _skippedQuads = new bool[_xPoints, 1, _zPoints];
-        
-      //  var mat = GetComponent<Renderer>().material;
+
+        //  var mat = GetComponent<Renderer>().material;
         // mat.mainTextureScale = Vector2();
-        
+
+        _dynamicHolePrefab.gameObject.SetActive(false);
         RegenerateMesh();
     }
 
@@ -67,6 +67,7 @@ public class DynamicGround : MonoBehaviour
         }
 
         RegenerateMesh(trailPoints, trailStartIndex);
+        CreateHoleObject(trailPoints, trailStartIndex);
     }
 
     private void RegenerateMesh(List<Vector3> trailPoints = null, int trailStartIndex = 0)
@@ -83,7 +84,7 @@ public class DynamicGround : MonoBehaviour
                 for (int x = 0; x <= _xPoints; x++, i++)
                 {
                     _vertices[i] = new Vector3(x / (float) _pointsPerUnit, 0, z / (float) _pointsPerUnit);
-                    _uv[i] = new Vector2(x / (float)_xPoints, z / (float)_zPoints);
+                    _uv[i] = new Vector2(x / (float) _xPoints, z / (float) _zPoints);
                 }
             }
         }
@@ -107,10 +108,10 @@ public class DynamicGround : MonoBehaviour
                         DistortPoint(x + 1, z + 1, trailPoints, trailStartIndex);
                     }
                 }
-                
+
                 // recalculate all UV's, some points are moved 
                 var vertexIndex = z * (_xPoints + 1) + x;
-                _uv[vertexIndex] =  MyMaths.squashVector(_vertices[vertexIndex]);
+                _uv[vertexIndex] = MyMaths.squashVector(_vertices[vertexIndex]);
             }
         }
 
@@ -133,7 +134,6 @@ public class DynamicGround : MonoBehaviour
 
         _mesh.triangles = triangles;
         _mesh.RecalculateNormals();
-        
     }
 
     // Move mesh point closer to the closest point OF the trail (good enaough not to calculate closest point ON the trail) 
@@ -142,17 +142,17 @@ public class DynamicGround : MonoBehaviour
         var vertexIndex = z * (_xPoints + 1) + x;
         if (_verticesMoved[vertexIndex]) // Leave already moved ones alone!
         {
-            Debug.DrawLine(
-                new Vector3(x, 0, z) / _pointsPerUnit,
-                new Vector3(x, 2, z) / _pointsPerUnit,
-                Color.black, 999);
+            // Debug.DrawLine(
+            //     new Vector3(x, 0, z) / _pointsPerUnit,
+            //     new Vector3(x, 2, z) / _pointsPerUnit,
+            //     Color.black, 999);
             return;
         }
 
-        Debug.DrawLine(
-            new Vector3(x, 0, z) / _pointsPerUnit,
-            new Vector3(x, 2, z) / _pointsPerUnit,
-            Color.green, 999);
+        // Debug.DrawLine(
+        //     new Vector3(x, 0, z) / _pointsPerUnit,
+        //     new Vector3(x, 2, z) / _pointsPerUnit,
+        //     Color.green, 999);
 
         var vertexPoint = _vertices[vertexIndex];
         var closestDistance = float.MaxValue;
@@ -172,10 +172,54 @@ public class DynamicGround : MonoBehaviour
             _vertices[vertexIndex] = trailPoints[closestTrailPointIndex];
             _verticesMoved[vertexIndex] = true;
             // Debug.Log($"d={closestDistance}");
-            Debug.DrawLine(
-                trailPoints[closestTrailPointIndex],
-                trailPoints[closestTrailPointIndex] + Vector3.up * 2,
-                Color.yellow, 999);
+            // Debug.DrawLine(
+            //     trailPoints[closestTrailPointIndex],
+            //     trailPoints[closestTrailPointIndex] + Vector3.up * 2,
+            //     Color.yellow, 999);
         }
+    }
+
+    private void CreateHoleObject(List<Vector3> trailPoints = null, int trailStartIndex = 0)
+    {
+        var startIndex = trailStartIndex + 1;
+        var endIndex = trailPoints.Count - 1;
+        Vector3[] vertices;
+        Vector2[] uv;
+        Mesh mesh;
+
+        var hole = Instantiate(_dynamicHolePrefab, Vector3.zero, Quaternion.identity, transform);
+        hole.gameObject.SetActive(true);
+        hole.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
+        mesh.name = $"Procedural Hole {_holeId}";
+        var num = endIndex - startIndex;
+        vertices = new Vector3[num];
+        uv = new Vector2[num];
+
+        for (int i = startIndex, k = 0; i < endIndex; i++, k++)
+        {
+            vertices[k] = trailPoints[i];
+            uv[k] = MyMaths.squashVector(vertices[k]);
+        }
+
+      
+
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+
+        var triangulator = new Triangulator(vertices);
+        mesh.triangles = triangulator.Triangulate();
+        mesh.RecalculateNormals();
+        //
+        // Vector3[] normals = mesh.normals;
+        //
+        // for (var i = 0; i < normals.Length; i++)
+        // {
+        //     Debug.Log($"_holeId={_holeId} {normals[i]}");
+        //     normals[i] = Vector3.up;
+        // }
+        //
+        // mesh.normals = normals;
+
+        _holeId++;
     }
 }

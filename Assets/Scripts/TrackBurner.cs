@@ -6,8 +6,10 @@ using UnityEngine.Serialization;
 public class TrackBurner : MonoBehaviour
 {
     [SerializeField] private TrailRenderer _trailRenderer;
-    [FormerlySerializedAs("dynamicGround")] [SerializeField] DynamicGround _dynamicGround;
-    
+
+    [FormerlySerializedAs("dynamicGround")] [SerializeField]
+    DynamicGround _dynamicGround;
+
     private readonly List<Vector3> _trailPoints = new List<Vector3>();
     private readonly List<DateTime> _trailTimes = new List<DateTime>();
     private Vector3 _lastPoint;
@@ -34,7 +36,7 @@ public class TrackBurner : MonoBehaviour
     {
         _trailPoints.Add(newPoint);
         _trailTimes.Add(DateTime.Now);
-
+        
         if (_trailPoints.Count < 4) return;
         var penultimatePoint = _trailPoints[_trailPoints.Count - 2];
 

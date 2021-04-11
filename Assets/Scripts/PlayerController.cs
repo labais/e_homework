@@ -1,23 +1,33 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField, Range(0f, 100f)] float maxSpeed = 10f;
-    [SerializeField, Range(0f, 100f)] float maxAcceleration = 10f;
-    [SerializeField, Range(0f, 100f)] float maxStickAngle = 10f;
-    [SerializeField] Transform stickContainer;
-    
-    
-    Vector3 velocity;
+    [FormerlySerializedAs("maxSpeed")] [SerializeField, Range(0f, 100f)]
+    float _maxSpeed = 10f;
 
-    void Start()
+    [FormerlySerializedAs("maxAcceleration")] [SerializeField, Range(0f, 100f)]
+    float _maxAcceleration = 10f;
+
+    [FormerlySerializedAs("maxStickAngle")] [SerializeField, Range(0f, 100f)]
+    float _maxStickAngle = 10f;
+
+    [FormerlySerializedAs("stickContainer")] [SerializeField]
+    Transform _stickContainer;
+
+    private Vector3 _velocity;
+    private Transform _transform;
+    
+
+    private void Start()
     {
+        _transform = transform;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         Vector2 playerInput;
         playerInput.x = Input.GetAxisRaw("Horizontal");
@@ -26,15 +36,14 @@ public class PlayerController : MonoBehaviour
 
         // Debug.Log($"{playerInput}");
 
-        Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+        Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * _maxSpeed;
 
-        float maxSpeedChange = maxAcceleration * Time.deltaTime;
-        velocity.x = Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
-        velocity.z = Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
+        float maxSpeedChange = _maxAcceleration * Time.deltaTime;
+        _velocity.x = Mathf.MoveTowards(_velocity.x, desiredVelocity.x, maxSpeedChange);
+        _velocity.z = Mathf.MoveTowards(_velocity.z, desiredVelocity.z, maxSpeedChange);
 
-        Vector3 displacement = velocity * Time.deltaTime;
-        Vector3 newPosition = transform.localPosition + displacement;
-        
+        Vector3 displacement = _velocity * Time.deltaTime;
+        Vector3 newPosition = _transform.localPosition + displacement;
 
         // if (newPosition.x < allowedArea.xMin) {
         //     newPosition.x = allowedArea.xMin;
@@ -53,13 +62,9 @@ public class PlayerController : MonoBehaviour
         //     velocity.z = -velocity.z * bounciness;
         // }
 
-        transform.localPosition = newPosition;
-        
-        // Debug.Log($"x% = {velocity.x/maxSpeed} velocity.x={velocity.x} maxSpeed={maxSpeed}");
 
-        stickContainer.eulerAngles = new Vector3(velocity.z/maxSpeed *maxStickAngle, 0,  velocity.x/maxSpeed *maxStickAngle );
+        _transform.localPosition = newPosition;
+      
+        _stickContainer.eulerAngles = new Vector3(_velocity.z / _maxSpeed * _maxStickAngle, 0, _velocity.x / _maxSpeed * _maxStickAngle);
     }
-    
-    
-    
 }
