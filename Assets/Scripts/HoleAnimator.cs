@@ -26,6 +26,7 @@ public class HoleAnimator : MonoBehaviour
         var beamDuration = .4f;
         var shakeMagnitude = .1f;
 
+        // Less shaking for holes farther from camera
         var distance = Vector3.Distance(Camera.main.transform.position, holeWall.position);
         var minD = 10;
         var maxD = 20;
