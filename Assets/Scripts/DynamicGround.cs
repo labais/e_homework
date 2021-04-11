@@ -13,6 +13,10 @@ public class DynamicGround : MonoBehaviour
     [SerializeField, Tooltip("Density")] private int _pointsPerUnit;
     [SerializeField] private Transform _dynamicHolePrefab;
     [SerializeField] private Transform _dynamicHoleWallPrefab;
+    [SerializeField] private Transform _wallBottom;
+    [SerializeField] private Transform _wallTop;
+    [SerializeField] private Transform _wallLeft;
+    [SerializeField] private Transform _wallRight;
 
     private int _xPoints, _zPoints;
     private Mesh _mesh;
@@ -30,6 +34,18 @@ public class DynamicGround : MonoBehaviour
         _dynamicHolePrefab.gameObject.SetActive(false);
         _dynamicHoleWallPrefab.gameObject.SetActive(false);
         RegenerateMesh();
+
+        _wallBottom.localPosition = new Vector3(xSize / 2f, 0, -.5f);
+        _wallBottom.localScale = new Vector3(xSize + 1, 1, 1);
+
+        _wallTop.localPosition = new Vector3(xSize / 2f, 0, zSize + .5f);
+        _wallTop.localScale = new Vector3(xSize * 1.1f, 1, 1);
+
+        _wallLeft.localPosition = new Vector3(-.5f, 0, zSize / 2f);
+        _wallLeft.localScale = new Vector3(1, 1, zSize + 1);
+
+        _wallRight.localPosition = new Vector3(xSize + .5f, 0, zSize / 2f);
+        _wallRight.localScale = new Vector3(1, 1, zSize + 1);
     }
 
     public void UpdateGround(List<Vector3> shapePoints = null)
@@ -69,9 +85,10 @@ public class DynamicGround : MonoBehaviour
 
         var hole = CreateHoleObject(shapePoints);
         var walls = CreateHoleWallObject(shapePoints);
-        
+        GiveHoleACollider(hole);
+
         Signals.Get<HoleGeneratedSignal>().Dispatch(hole, walls);
-        
+
         _holeId++;
     }
 
@@ -275,25 +292,38 @@ public class DynamicGround : MonoBehaviour
                 triangles[t++] = k;
                 triangles[t++] = 0;
                 triangles[t++] = k + num;
-                
+
                 triangles[t++] = 0;
                 triangles[t++] = num;
                 triangles[t++] = k + num;
             }
 
             // wallpapering the wall
-            var percentageOfWall = k / (float)num;
+            var percentageOfWall = k / (float) num;
             var c = bandLen * percentageOfWall;
             uv[k] = new Vector2(c, 0);
             uv[k + num] = new Vector2(c, 1);
-            
         }
 
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
-        
+
         return holeWalls;
+    }
+
+    private void GiveHoleACollider(Transform hole)
+    {
+        var mc = hole.GetComponent<MeshCollider>();
+        var mesh = hole.GetComponent<MeshFilter>().mesh;
+
+        var newMesh = new Mesh
+        {
+            vertices = mesh.vertices,
+            triangles = mesh.triangles,
+        };
+        newMesh.RecalculateBounds();
+        mc.sharedMesh = newMesh;
     }
 }

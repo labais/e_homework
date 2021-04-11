@@ -502,11 +502,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!96 &2082962736 stripped
-TrailRenderer:
-  m_CorrespondingSourceObject: {fileID: 5408341691419860884, guid: 1db16557ce833ac4c8980b51097349b6, type: 3}
-  m_PrefabInstance: {fileID: 6831263131516406111}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5270593723097098883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -575,10 +570,6 @@ PrefabInstance:
       propertyPath: _dynamicGround
       value: 
       objectReference: {fileID: 1731904066}
-    - target: {fileID: 6831263131975148792, guid: 1db16557ce833ac4c8980b51097349b6, type: 3}
-      propertyPath: _trailRenderer
-      value: 
-      objectReference: {fileID: 2082962736}
     - target: {fileID: 6831263131975148793, guid: 1db16557ce833ac4c8980b51097349b6, type: 3}
       propertyPath: m_RootOrder
       value: 3
