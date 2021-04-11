@@ -211,6 +211,18 @@ public class DynamicGround : MonoBehaviour
         var triangulator = new Triangulator(vertices);
         mesh.triangles = triangulator.Triangulate();
         mesh.RecalculateNormals();
+
+        var normals = mesh.normals;
+        for (var i = 0; i < normals.Length; i++)
+        {
+            if (normals[i].normalized != Vector3.up)
+            {
+                // HAXXX: if you retrace your steps and finish a shape, it comes out all messed up, this kind of helps
+                // Debug.Log("Fixed inverse hole");
+                MyMaths.InverseTriangles(mesh);
+                return;
+            }
+        }
     }
 
     private void CreateHoleWallObject(List<Vector3> shapePoints = null)
@@ -256,7 +268,7 @@ public class DynamicGround : MonoBehaviour
                 triangles[t++] = k;
                 triangles[t++] = 0;
                 triangles[t++] = k + num;
-                
+
                 triangles[t++] = 0;
                 triangles[t++] = num;
                 triangles[t++] = k + num;

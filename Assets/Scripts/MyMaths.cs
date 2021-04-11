@@ -100,4 +100,20 @@ public class MyMaths
 
         return sum > 0.0;
     }
+    
+    public static void InverseTriangles(Mesh mesh)
+    {
+        var indices = mesh.triangles;
+        var triangleCount = indices.Length / 3;
+        for (var i = 0; i < triangleCount; i++)
+        {
+            var tmp = indices[i * 3];
+            indices[i * 3] = indices[i * 3 + 1];
+            indices[i * 3 + 1] = tmp;
+        }
+
+        mesh.triangles = indices;
+        mesh.RecalculateNormals();
+    }
+    
 }

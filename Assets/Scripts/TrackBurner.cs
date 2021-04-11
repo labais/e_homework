@@ -49,14 +49,9 @@ public class TrackBurner : MonoBehaviour
 
                if (MyMaths.IsClockwise(shapePoints))
                {
-                    Debug.Log("was CW");
-                    shapePoints.Reverse();
+                    shapePoints.Reverse(); 
+                    // Can't have Clockwise shape, the walls then are generated inside out
                }
-               else
-               {
-                   Debug.Log("was CCW");   
-               }
-
 
                _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
