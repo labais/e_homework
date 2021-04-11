@@ -100,7 +100,7 @@ public class MyMaths
 
         return sum > 0.0;
     }
-    
+
     public static void InverseTriangles(Mesh mesh)
     {
         var indices = mesh.triangles;
@@ -115,5 +115,20 @@ public class MyMaths
         mesh.triangles = indices;
         mesh.RecalculateNormals();
     }
-    
+
+    public static Vector3 CenterOfVectors(List<Vector3> vectors)
+    {
+        var sum = Vector3.zero;
+        if (vectors == null || vectors.Count == 0)
+        {
+            return sum;
+        }
+
+        foreach (Vector3 vec in vectors)
+        {
+            sum += vec;
+        }
+
+        return sum / vectors.Count;
+    }
 }

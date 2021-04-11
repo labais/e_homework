@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -141,7 +142,7 @@ public class DynamicGround : MonoBehaviour
     }
 
     // Move mesh point closer to the closest point OF the trail (good enaough not to calculate closest point ON the trail) 
-    private void DistortPoint(int x, int z, List<Vector3> shapePoints = null)
+    private void DistortPoint(int x, int z, List<Vector3> shapePoints)
     {
         var vertexIndex = z * (_xPoints + 1) + x;
         if (_verticesMoved[vertexIndex]) // Leave already moved ones alone!
@@ -164,7 +165,7 @@ public class DynamicGround : MonoBehaviour
         for (var i = 1; i < shapePoints.Count - 1; i++)
         {
             var d = Vector3.Distance(vertexPoint, shapePoints[i]);
-            if (d < closestDistance && d < (1.0 / _pointsPerUnit) * 1.6f) // Consider moving only nearby points
+            if (d < closestDistance && d < (1.0 / _pointsPerUnit) * 1.7f) // Consider moving only nearby points
             {
                 closestDistance = d;
                 closestTrailPointIndex = i;
@@ -183,7 +184,7 @@ public class DynamicGround : MonoBehaviour
         }
     }
 
-    private void CreateHoleObject(List<Vector3> shapePoints = null)
+    private void CreateHoleObject(List<Vector3> shapePoints)
     {
         var startIndex = 1;
         var endIndex = shapePoints.Count - 1;
@@ -227,13 +228,22 @@ public class DynamicGround : MonoBehaviour
 
     private void CreateHoleWallObject(List<Vector3> shapePoints = null)
     {
+        var centerOfMass = MyMaths.CenterOfVectors(shapePoints);
+        for (var i = 0; i < shapePoints.Count; i++)
+        {
+            // Set points relative to the shape center
+            shapePoints[i] = shapePoints[i] - centerOfMass;
+        }
+
+        Debug.Log($"centerOfMass={centerOfMass}");
+
         var startIndex = 1;
         var endIndex = shapePoints.Count - 1;
         Vector3[] vertices;
         Vector2[] uv;
         Mesh mesh;
 
-        var hole = Instantiate(_dynamicHoleWallPrefab, Vector3.zero, Quaternion.identity, transform);
+        var hole = Instantiate(_dynamicHoleWallPrefab, centerOfMass, Quaternion.identity, transform);
         hole.gameObject.SetActive(true);
         hole.GetComponent<MeshFilter>().mesh = mesh = new Mesh();
         hole.gameObject.name = mesh.name = $"HoleWall{_holeId}";
@@ -244,13 +254,12 @@ public class DynamicGround : MonoBehaviour
         int[] triangles = new int[(num + 1) * 6 * 2];
 
         // Triangulate band
+        var bandLen = Mathf.Sqrt(shapePoints.Sum(x => x.sqrMagnitude));
         var t = 0;
         for (int i = startIndex, k = 0; i < endIndex; i++, k++)
         {
             vertices[k] = shapePoints[i] + Vector3.up;
             vertices[k + num] = shapePoints[i]; // + Vector3.down;
-            uv[k] = MyMaths.squashVector(vertices[k]); // @todo -- wallpaper that bad boi
-            uv[k + num] = MyMaths.squashVector(vertices[k + num]);
 
             if (i < endIndex - 1)
             {
@@ -268,11 +277,18 @@ public class DynamicGround : MonoBehaviour
                 triangles[t++] = k;
                 triangles[t++] = 0;
                 triangles[t++] = k + num;
-
+                
                 triangles[t++] = 0;
                 triangles[t++] = num;
                 triangles[t++] = k + num;
             }
+
+            // wallpapering the wall
+            var percentageOfWall = k / (float)num;
+            var c = bandLen * percentageOfWall;
+            uv[k] = new Vector2(c, 0);
+            uv[k + num] = new Vector2(c, 1);
+            
         }
 
         mesh.vertices = vertices;
