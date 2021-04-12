@@ -16,3 +16,7 @@ public class PlayerDiedSignal : ASignal
 public class PlayerFinishedSignal : ASignal
 {
 }
+
+public class PlayerStartedControllingSignal : ASignal
+{
+}

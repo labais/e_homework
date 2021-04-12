@@ -1,10 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using deVoid.Utils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
@@ -29,6 +26,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 _lastInput;
     private const int FinishedAutoMoveTTLNominal = 60;
 
+    private bool _firstInputRecieved;
+
     private void Start()
     {
         _transform = transform;
@@ -52,12 +51,23 @@ public class PlayerController : MonoBehaviour
 
         if (!_dead && !_finished)
         {
-            playerInput.x = Input.GetAxisRaw("Horizontal");
-            playerInput.y = Input.GetAxisRaw("Vertical");
+            var gamepad = Gamepad.current;
+            if (gamepad == null)
+            {
+                Debug.Log("no gamepad!");
+                return;
+            }
+            
+            playerInput = gamepad.leftStick.ReadValue();
 
 #if !UNITY_EDITOR
             playerInput += new Vector2(Random.Range(-1f,1f), 1); // fake input for build
 #endif
+            if (!_firstInputRecieved && playerInput.magnitude > .3f)
+            {
+                _firstInputRecieved = true;
+                Signals.Get<PlayerStartedControllingSignal>().Dispatch();
+            }
 
             playerInput = Vector2.ClampMagnitude(playerInput, 1f);
             _lastInput = playerInput;
