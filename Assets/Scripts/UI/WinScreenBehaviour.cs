@@ -10,6 +10,9 @@ public class WinScreenBehaviour : MonoBehaviour
     [SerializeField] private GameObject _content;
     [SerializeField] private TextMeshProUGUI _text1;
     [SerializeField] private Button _buttonNextLevel;
+    [SerializeField] private Animator _screenAnimator;
+    
+    private static readonly int Open = Animator.StringToHash("Open");
 
     private void OnEnable()
     {
@@ -36,5 +39,6 @@ public class WinScreenBehaviour : MonoBehaviour
     {
         _content.SetActive(true);
         _text1.text = $"Level {GameManager.I.LevelNumber.ToString("D2")} finished!";
+        _screenAnimator.SetTrigger(Open);
     }
 }

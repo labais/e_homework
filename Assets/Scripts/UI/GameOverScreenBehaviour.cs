@@ -8,6 +8,9 @@ public class GameOverScreenBehaviour : MonoBehaviour
 {
     [SerializeField] private GameObject _content;
     [SerializeField] private Button _buttonRestart;
+    [SerializeField] private Animator _screenAnimator;
+    
+    private static readonly int Open = Animator.StringToHash("Open");
     
     private void OnEnable()
     {
@@ -32,6 +35,7 @@ public class GameOverScreenBehaviour : MonoBehaviour
 
     private void OnPlayerDied()
     {
+        _screenAnimator.SetTrigger(Open);
         _content.SetActive(true);
     }
 }
