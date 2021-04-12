@@ -23,6 +23,11 @@ public class PlayerController : MonoBehaviour
     private Vector3 _velocity;
     private Transform _transform;
     private bool _dead;
+    
+    private bool _finished;
+    private int _finishedAutoMoveTTL;
+    private Vector3 _lastInput;
+    private const int FinishedAutoMoveTTLNominal = 60;
 
     private void Start()
     {
@@ -32,29 +37,38 @@ public class PlayerController : MonoBehaviour
     void OnEnable()
     {
         Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
+        Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
     }
 
     void OnDisable()
     {
         Signals.Get<PlayerDiedSignal>().RemoveListener(OnPlayerDied);
+        Signals.Get<PlayerFinishedSignal>().RemoveListener(OnPlayerFinished);
     }
 
     private void FixedUpdate()
     {
         var playerInput = Vector2.zero;
-        
-        if (!_dead)
+
+        if (!_dead && !_finished)
         {
             playerInput.x = Input.GetAxisRaw("Horizontal");
             playerInput.y = Input.GetAxisRaw("Vertical");
 
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
             playerInput += new Vector2(Random.Range(-1f,1f), 1); // fake input for build
-            #endif
-            
+#endif
+
             playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+            _lastInput = playerInput;
         }
-        
+
+        if (_finished && _finishedAutoMoveTTL-- > 0)
+        {
+            // continue last input before finishing, but slow it down
+            playerInput = _lastInput * Mathf.Lerp(.1f, 0, 1- ((float)_finishedAutoMoveTTL / FinishedAutoMoveTTLNominal));
+        }
+
         Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * _maxSpeed;
 
         float maxSpeedChange = _maxAcceleration * Time.deltaTime;
@@ -72,5 +86,11 @@ public class PlayerController : MonoBehaviour
     private void OnPlayerDied()
     {
         _dead = true;
+    }
+
+    private void OnPlayerFinished()
+    {
+        _finished = true;
+        _finishedAutoMoveTTL = FinishedAutoMoveTTLNominal;
     }
 }
