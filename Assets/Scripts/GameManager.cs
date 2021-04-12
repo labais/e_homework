@@ -27,7 +27,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        Debug.Log("lol, destroyed!");
     }
 
     void OnLevelFinishedLoading(Scene arg0, LoadSceneMode arg1)
