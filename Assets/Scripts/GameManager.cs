@@ -1,4 +1,3 @@
-using System;
 using DG.Tweening;
 using EasyButtons;
 using UnityEngine;
@@ -6,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager I;
+    public static GameManager I { get; private set; }
 
     public int LevelNumber { get; set; }
     private int _numTimesLevelLoaded = 0;

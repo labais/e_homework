@@ -19,6 +19,11 @@ public class PlayerCollisionChecker : MonoBehaviour
         {
             // pass
         }
+        else if (other.CompareTag("Bullet"))
+        {
+            Debug.Log("can't hurt me nuttin");
+            Signals.Get<PlayerGotHitSignal>().Dispatch();
+        }
         else
         {
             Signals.Get<PlayerDiedSignal>().Dispatch();

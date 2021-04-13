@@ -31,11 +31,13 @@ public class TrackBurner : MonoBehaviour
     void OnEnable()
     {
         Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
+        Signals.Get<PlayerGotHitSignal>().AddListener(OnPlayerGotHit);
     }
 
     void OnDisable()
     {
         Signals.Get<PlayerFinishedSignal>().RemoveListener(OnPlayerFinished);
+        Signals.Get<PlayerGotHitSignal>().RemoveListener(OnPlayerGotHit);
     }
 
     void FixedUpdate()
@@ -129,6 +131,13 @@ public class TrackBurner : MonoBehaviour
     private void OnPlayerFinished()
     {
         _finished = true;
+    }
+
+    private void OnPlayerGotHit()
+    {
+        CutTailAtIndex(_trailPoints.Count - 1);
+        _trailRendererCutting.Clear();
+        Debug.LogError("@odo -- fire sparks or smtn, just lost a tail");
     }
 
     private void CheckIfEnemyIsNotCuttingTrail()

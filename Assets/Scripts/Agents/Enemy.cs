@@ -13,8 +13,10 @@ public class Enemy : MonoBehaviour
     private float _modeTTL;
     private Vector3 _direction;
     private Transform _transform;
-    private const float MaxSpeed = .005f;
     private bool _dead;
+
+    private const float MaxSpeed = .005f; // @todo -- randomize a little and seldom randomize a lot 
+    private const float MinPlayerDistanceToShoot = 10;
 
     private void Start()
     {
@@ -26,7 +28,7 @@ public class Enemy : MonoBehaviour
     private void FixedUpdate()
     {
         if (_dead) return;
-        
+
         if ((_modeTTL -= Time.fixedDeltaTime) < 0)
         {
             _mode = (Mode) Random.Range(0, 2 + 1);
@@ -38,6 +40,9 @@ public class Enemy : MonoBehaviour
                 case Mode.Wander:
                     _modeTTL = Random.Range(1f, 4f);
                     break;
+                case Mode.Shoot:
+                    _modeTTL = 1;
+                    break;
             }
 
             _direction = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
@@ -46,7 +51,6 @@ public class Enemy : MonoBehaviour
 
             if (!_forwardChecker.IsCool)
             {
-                // Debug.Log("PLANNING not cool to walk there");
                 _mode = Mode.Wait;
                 _modeTTL = .02f;
             }
@@ -57,8 +61,22 @@ public class Enemy : MonoBehaviour
             _transform.position += _direction * MaxSpeed;
             if (!_forwardChecker.IsCool)
             {
-                // Debug.Log("WALKING not cool to walk there");
                 _modeTTL = 0;
+            }
+        }
+        else if (_mode == Mode.Shoot)
+        {
+            if (Vector3.Distance(transform.position, Player.I.transform.position) > MinPlayerDistanceToShoot)
+            {
+                _modeTTL = -1; // do something else;
+                return;
+            }
+
+            // at the end of aiming shoot
+            if (_modeTTL <= .1f)
+            {
+                BulletManager.I.Shoot(transform.position, Player.I.transform.position, Player.I.InstantMovement);
+                _modeTTL = -1;
             }
         }
     }
@@ -104,5 +122,6 @@ public class Enemy : MonoBehaviour
     {
         Wait,
         Wander,
+        Shoot,
     }
 }

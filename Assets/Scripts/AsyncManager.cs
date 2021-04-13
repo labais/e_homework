@@ -7,7 +7,7 @@ using UnityEngine;
 public class AsyncManager : MonoBehaviour
 {
     
-    public static AsyncManager I;
+    public static AsyncManager I { get; private set; }
     
     private readonly Dictionary<Action, Coroutine> _coroutines = new Dictionary<Action, Coroutine>();
     private readonly ConcurrentQueue<Action> _mainThreadActions = new ConcurrentQueue<Action>();

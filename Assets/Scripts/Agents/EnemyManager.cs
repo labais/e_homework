@@ -8,7 +8,7 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
 
-    public static EnemyManager I;
+    public static EnemyManager I { get; private set; }
 
     private const float MinDistanceFromNextEnemy = .9f;
 
