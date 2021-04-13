@@ -24,13 +24,11 @@ public class EnemyManager : MonoBehaviour
 
     private void Start()
     {
-        //  _prefab.SetActive(false);// ---------------------------------------------------------------------------
+        _prefab.SetActive(false);
     }
 
     private void OnLevelGenerated(float levelSizeX, float levelSizeZ)
     {
-        return; // ---------------------------------------------------------------------------
-
         // @todo -- parametrise depending on GameManager.I.LevelNumber 
         var chunks = Random.Range(2, 10);
         var maxNumPerChunk = Random.Range(1, 8);

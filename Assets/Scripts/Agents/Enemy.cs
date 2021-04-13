@@ -12,12 +12,8 @@ public class Enemy : MonoBehaviour
     private Mode _mode;
     private float _modeTTL;
     private Vector3 _direction;
-    private float _walkTime;
     private Transform _transform;
-    private float _speed;
-    private float _speedPercentageAtSlowdownStart;
-    private const float MaxSpeed = .05f;
-    
+    private const float MaxSpeed = .005f;
 
     private void Start()
     {
@@ -30,48 +26,60 @@ public class Enemy : MonoBehaviour
     {
         if ((_modeTTL -= Time.fixedDeltaTime) < 0)
         {
-            _mode = (Mode) Random.Range(0, 2+1);
+            _mode = (Mode) Random.Range(0, 2 + 1);
             switch (_mode)
             {
                 case Mode.Wait:
                     _modeTTL = Random.Range(.1f, 1f);
                     break;
                 case Mode.Wander:
-                    _modeTTL = Random.Range(1f, 3f);
+                    _modeTTL = Random.Range(1f, 4f);
                     break;
             }
-           
+
             _direction = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             _direction.Normalize();
             _forwardChecker.transform.position = _transform.position + _direction * .4f;
-            _walkTime = 0;
+
+            if (!_forwardChecker.IsCool)
+            {
+                Debug.Log("PLANNING not cool to walk there");
+                _mode = Mode.Wait;
+                _modeTTL = .01f;
+            }
         }
 
         if (_mode == Mode.Wander)
         {
-            if (_modeTTL > .5f) // @note -- must be inverse of slowdown easing time
+            _transform.position += _direction * MaxSpeed;
+            if (!_forwardChecker.IsCool)
             {
-                // speedup and move
-                _walkTime += Time.fixedDeltaTime;
-                _speed = DOVirtual.EasedValue(0, .5f, _walkTime*2, Ease.InSine);
-                _transform.position += _direction * (MaxSpeed * _speed);
-                _speedPercentageAtSlowdownStart = MaxSpeed / _speed;
+                Debug.Log("WALKING not cool to walk there");
+                _modeTTL = 0;
             }
-            else
-            {
-                // slowdown
-                _speed = DOVirtual.EasedValue(0, _speedPercentageAtSlowdownStart, _modeTTL/2 , Ease.OutSine);
-                _transform.position += _direction * (MaxSpeed * _speed);
-            }
-
         }
-
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            _agentEffects.AnimateDeath(AfterDeathAnimation);
+        }
+        else if (other.CompareTag("Finish"))
+        {
+        }
+        else if (other.CompareTag("Enemy"))
+        {
+        }
+        else if (other.CompareTag("EnemyForwardChecker"))
+        {
+            // pass
+        }
+        else
+        {
+            // doesn't work :\ 
+            // fall off from level (not likely, but still) (sides and holes) 
             _agentEffects.AnimateDeath(AfterDeathAnimation);
         }
     }
