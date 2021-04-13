@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using EasyButtons;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,7 +19,6 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnLevelFinishedLoading;
             LevelNumber = 0;
-            Debug.Log($"this one time you know");
         }
         else
         {
@@ -35,19 +35,20 @@ public class GameManager : MonoBehaviour
         LevelNumber++;
         _numTimesLevelLoaded++;
         // Debug.Log($"_numTimesLevelLoaded={_numTimesLevelLoaded} arg0={arg0} arg1={arg1}");
-        Debug.Log($"OnLevelFinishedLoading LevelNumber={LevelNumber}");
+        // Debug.Log($"OnLevelFinishedLoading LevelNumber={LevelNumber}");
     }
 
     [Button]
     public void RestartGame()
     {
-        LevelNumber = 0;
+        DOTween.KillAll();
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
     }
 
     [Button]
     public void NexLevel()
     {
+        DOTween.KillAll();
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
     }
 }

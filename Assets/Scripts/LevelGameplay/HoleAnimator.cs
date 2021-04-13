@@ -21,24 +21,24 @@ public class HoleAnimator : MonoBehaviour
     private void OnHoleGenerated(Transform hole, Transform holeWall)
     {
         holeWall.localScale = new Vector3(1, 50, 1);
-        var beamDuration = .4f;
-        var shakeMagnitude = .3f;
+        const float beamDuration = .4f;
+        const float shakeMagnitude = .3f;
+        const float minD = 10;
+        const float maxD = 20;
+        const float minL = 2;
+        const float maxL = 25;
 
         // Less shaking for holes farther from camera
         var distance = Vector3.Distance(Camera.main.transform.position, holeWall.position);
-        const float minD = 10;
-        const float maxD = 20;
         var percentageDistance = Mathf.Clamp01((distance - minD) / (maxD - minD));
-        var distanceFromCameraPenalty = (1 - percentageDistance);
+        var distanceFromCameraPenalty = (1 - percentageDistance) * 1.2f;
 
         var shapeLength = MyMaths.ShapeLength(hole.GetComponent<MeshFilter>().mesh.vertices);
-     
-        const float minL = 2;
-        const float maxL = 25;
+
         var lenghtBonus = 1 + (Mathf.Clamp01((shapeLength - minL) / (maxL - minL)) * .5f);
-        
-       // Debug.Log($"shapeLength={shapeLength} lenghtBonus={lenghtBonus} distance={distance} distanceFromCameraPenalty={distanceFromCameraPenalty}");
-        
+
+        // Debug.Log($"shapeLength={shapeLength} lenghtBonus={lenghtBonus} distance={distance} distanceFromCameraPenalty={distanceFromCameraPenalty}");
+
         Sequence sequence = DOTween.Sequence();
         sequence.AppendCallback(() =>
         {

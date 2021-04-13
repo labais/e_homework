@@ -35,7 +35,8 @@ public class DynamicGround : MonoBehaviour
         _dynamicHolePrefab.gameObject.SetActive(false);
         _dynamicHoleWallPrefab.gameObject.SetActive(false);
         RegenerateMesh();
-
+        Signals.Get<LevelGeneratedSignal>().Dispatch(xSize, zSize);
+        
         _wallBottom.localPosition = new Vector3(xSize / 2f, 0, -.5f);
         _wallBottom.localScale = new Vector3(xSize + 1, 1, 1);
 

@@ -35,7 +35,7 @@ public class GameOverScreenBehaviour : MonoBehaviour
 
     private void OnPlayerDied()
     {
-        _screenAnimator.SetTrigger(Open);
         _content.SetActive(true);
+        _screenAnimator.SetTrigger(Open);
     }
 }

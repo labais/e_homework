@@ -1,23 +1,14 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using deVoid.Utils;
 using DG.Tweening;
 using UnityEngine;
 
-public class PlayerEffects : MonoBehaviour
+public class AgentEffects : MonoBehaviour
 {
     private static readonly int SliceAmount = Shader.PropertyToID("_SliceAmount");
+    private const float DurationSec = 3;
 
-    void OnEnable()
-    {
-        Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
-    }
-    void OnDisable()
-    {
-        Signals.Get<PlayerDiedSignal>().RemoveListener(OnPlayerDied);
-    }
-
-    private void OnPlayerDied()
+    public void AnimateDeath(Action callback = null)
     {
         var renderers = GetComponentsInChildren<Renderer>();
         var materials = new List<Material>();
@@ -28,13 +19,13 @@ public class PlayerEffects : MonoBehaviour
 
         foreach (var material in materials)
         {
-            DOVirtual.Float(0, 1, 3f, (percentage) =>
+            DOVirtual.Float(0, 1, DurationSec, (percentage) =>
             {
                 var eased = DOVirtual.EasedValue(0, 1, percentage, Ease.OutQuad);
                 material.SetFloat(SliceAmount, eased);
             });
         }
-       
+
+        AsyncManager.I.Delay(TimeSpan.FromSeconds(DurationSec + .01f), () => { callback.TryInvoke(); });
     }
-    
 }

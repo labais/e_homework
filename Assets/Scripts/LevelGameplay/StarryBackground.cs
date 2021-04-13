@@ -60,7 +60,7 @@ public class StarryBackground : MonoBehaviour
         var camDelta = _cam.position.z - _startingCamPosZ;
         _transform.position = _origPosition + Vector3.forward * (camDelta * _followSpeed);
 
-        if (Random.Range(0, 15) == 0)
+        if (Random.Range(0, 30) == 0)
         {
             var r = Random.Range(0, _stars.Count);
             var starSpriteR = _starSpriteRenderers[r];
@@ -87,8 +87,4 @@ public class StarryBackground : MonoBehaviour
         }
     }
 
-    private void OnDisable()
-    {
-        DOTween.KillAll();
-    }
 }
