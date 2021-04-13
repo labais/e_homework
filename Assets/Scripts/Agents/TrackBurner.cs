@@ -17,30 +17,13 @@ public class TrackBurner : MonoBehaviour
     private bool _finished;
 
     private float _trailLengthSeconds = 50;
-    private  float _trailCuttingLengthSeconds = 2;
-    // public float TrailWidthFat = .1f;
-    // public float TrailWidthThin = .05f;
-
-    // private readonly Vector3 DO = Vector3.up; // Debug Offset for vector drawing
-    // private readonly Vector3 DO2 = Vector3.up * 0.1f;
+    private float _trailCuttingLengthSeconds = 20;
 
     private void Start()
     {
         AddPointAndCheckIfCrossed(transform.position);
         _trailRendererLong.time = _trailLengthSeconds;
         _trailRendererCutting.time = _trailCuttingLengthSeconds;
-        //
-        // var curve = new AnimationCurve();
-        // var cuttingCutoffTime = TrailCuttingLengthSeconds / TrailLengthSeconds;
-        //
-        // curve.AddKey(0.0f, TrailWidthFat);
-        // curve.AddKey(cuttingCutoffTime - .01f, TrailWidthFat);
-        // curve.AddKey(cuttingCutoffTime - .02f, TrailWidthFat);
-        // curve.AddKey(cuttingCutoffTime, TrailWidthThin);
-        // curve.AddKey(cuttingCutoffTime + .01f, TrailWidthThin);
-        // curve.AddKey(1f, TrailWidthThin);
-        //
-        // _trailRenderer.widthCurve = curve;
     }
 
     void OnEnable()
@@ -63,6 +46,8 @@ public class TrackBurner : MonoBehaviour
             AddPointAndCheckIfCrossed(_lastPoint);
             CutOffOldPoints();
         }
+
+        CheckIfEnemyIsNotCuttingTrail();
     }
 
     private void AddPointAndCheckIfCrossed(Vector3 newPoint)
@@ -87,9 +72,9 @@ public class TrackBurner : MonoBehaviour
 
                 _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
-                
+
                 // Cut off all tail
-                CutTailAtIndex(_trailPoints.Count-1);
+                CutTailAtIndex(_trailPoints.Count - 1);
                 _trailRendererCutting.Clear();
 
                 return;
@@ -140,5 +125,24 @@ public class TrackBurner : MonoBehaviour
     private void OnPlayerFinished()
     {
         _finished = true;
+    }
+
+    private void CheckIfEnemyIsNotCuttingTrail()
+    {
+        const float EnemyDistanceToCut = .2f;
+        if (EnemyManager.I.Enemies == null) return;
+        foreach (var enemy in EnemyManager.I.Enemies)
+        {
+            for (int i = 0; i < _trailPoints.Count; i++)
+            {
+                var d = Vector3.Distance(_trailPoints[i], enemy.position);
+                if (d < EnemyDistanceToCut)
+                {
+                    CutTailAtIndex(i);
+                    _trailRendererCutting.Clear();
+                        Debug.Log("Bums, AI tikko man nogrieza asti, vajag feijerverķus!");
+                }
+            }
+        }
     }
 }

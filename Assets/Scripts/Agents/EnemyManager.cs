@@ -8,9 +8,11 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
 
+    public static EnemyManager I;
+    
     private const float MinDistanceFromNextEnemy = .9f;
 
-    private List<Transform> _enemies;
+    public List<Transform> Enemies;
 
     private void OnEnable()
     {
@@ -20,6 +22,11 @@ public class EnemyManager : MonoBehaviour
     private void OnDisable()
     {
         Signals.Get<LevelGeneratedSignal>().RemoveListener(OnLevelGenerated);
+    }
+
+    private void Awake()
+    {
+        I = this;
     }
 
     private void Start()
@@ -33,10 +40,10 @@ public class EnemyManager : MonoBehaviour
         var chunks = Random.Range(2, 10);
         var maxNumPerChunk = Random.Range(1, 8);
 
-        _enemies = new List<Transform>();
+        Enemies = new List<Transform>();
 
-        Debug.Log($"EnemyManager::chunks={chunks}");
-        Debug.Log($"EnemyManager::maxNumPerChunk={maxNumPerChunk}");
+        // Debug.Log($"EnemyManager::chunks={chunks}");
+        // Debug.Log($"EnemyManager::maxNumPerChunk={maxNumPerChunk}");
 
         for (var i = 0; i < chunks; i++)
         {
@@ -56,7 +63,7 @@ public class EnemyManager : MonoBehaviour
 
             if (!foundEmptySpot)
             {
-                Debug.Log("no free space to spawn enemy chunk!");
+                // Debug.Log("no free space to spawn enemy chunk!");
                 break;
             }
 
@@ -80,14 +87,14 @@ public class EnemyManager : MonoBehaviour
 
                 if (!foundEmptySpot)
                 {
-                    Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} No free space to put enemy");
+                    // Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} No free space to put enemy");
                     continue;
                 }
 
                 // Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} enemy pos={enemyPosition}");
                 var enemy = Instantiate(_prefab, enemyPosition, Quaternion.identity, transform);
 
-                _enemies.Add(enemy.transform);
+                Enemies.Add(enemy.transform);
                 enemy.SetActive(true);
             }
         }
@@ -105,7 +112,7 @@ public class EnemyManager : MonoBehaviour
     {
         var maxD = float.MaxValue;
 
-        foreach (var enemy in _enemies)
+        foreach (var enemy in Enemies)
         {
             var d = Vector3.Distance(pos, enemy.position);
             if (d < maxD)

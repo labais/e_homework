@@ -43,9 +43,9 @@ public class Enemy : MonoBehaviour
 
             if (!_forwardChecker.IsCool)
             {
-                Debug.Log("PLANNING not cool to walk there");
+                // Debug.Log("PLANNING not cool to walk there");
                 _mode = Mode.Wait;
-                _modeTTL = .01f;
+                _modeTTL = .02f;
             }
         }
 
@@ -54,7 +54,7 @@ public class Enemy : MonoBehaviour
             _transform.position += _direction * MaxSpeed;
             if (!_forwardChecker.IsCool)
             {
-                Debug.Log("WALKING not cool to walk there");
+                // Debug.Log("WALKING not cool to walk there");
                 _modeTTL = 0;
             }
         }

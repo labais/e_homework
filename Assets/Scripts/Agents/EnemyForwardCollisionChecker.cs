@@ -15,7 +15,7 @@ public class EnemyForwardCollisionChecker : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.LogError($"Enemy {gameObject.name} encountered {other.gameObject}");
+        // Debug.LogError($"Enemy {gameObject.name} encountered {other.gameObject}");
         IsCool = false;
     }
     
