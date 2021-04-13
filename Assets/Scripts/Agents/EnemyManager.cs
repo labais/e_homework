@@ -9,10 +9,10 @@ public class EnemyManager : MonoBehaviour
     [SerializeField] private GameObject _prefab;
 
     public static EnemyManager I;
-    
+
     private const float MinDistanceFromNextEnemy = .9f;
 
-    public List<Transform> Enemies;
+    public List<Enemy> Enemies;
 
     private void OnEnable()
     {
@@ -40,7 +40,7 @@ public class EnemyManager : MonoBehaviour
         var chunks = Random.Range(2, 10);
         var maxNumPerChunk = Random.Range(1, 8);
 
-        Enemies = new List<Transform>();
+        Enemies = new List<Enemy>();
 
         // Debug.Log($"EnemyManager::chunks={chunks}");
         // Debug.Log($"EnemyManager::maxNumPerChunk={maxNumPerChunk}");
@@ -94,7 +94,7 @@ public class EnemyManager : MonoBehaviour
                 // Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} enemy pos={enemyPosition}");
                 var enemy = Instantiate(_prefab, enemyPosition, Quaternion.identity, transform);
 
-                Enemies.Add(enemy.transform);
+                Enemies.Add(enemy.GetComponent<Enemy>());
                 enemy.SetActive(true);
             }
         }
@@ -114,7 +114,9 @@ public class EnemyManager : MonoBehaviour
 
         foreach (var enemy in Enemies)
         {
-            var d = Vector3.Distance(pos, enemy.position);
+            if(enemy == null) continue;
+            
+            var d = Vector3.Distance(pos, enemy.transform.position);
             if (d < maxD)
             {
                 maxD = d;

@@ -17,7 +17,9 @@ public class TrackBurner : MonoBehaviour
     private bool _finished;
 
     private float _trailLengthSeconds = 50;
-    private float _trailCuttingLengthSeconds = 20;
+    private float _trailCuttingLengthSeconds = 2;
+
+    const float EnemyDistanceToCut = .2f;
 
     private void Start()
     {
@@ -25,7 +27,7 @@ public class TrackBurner : MonoBehaviour
         _trailRendererLong.time = _trailLengthSeconds;
         _trailRendererCutting.time = _trailCuttingLengthSeconds;
     }
-
+    
     void OnEnable()
     {
         Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
@@ -69,6 +71,8 @@ public class TrackBurner : MonoBehaviour
                     shapePoints.Reverse();
                     // Can't have Clockwise shape, the walls then are generated inside out
                 }
+
+                CheckEnemiesInsideShape();
 
                 _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
@@ -129,20 +133,37 @@ public class TrackBurner : MonoBehaviour
 
     private void CheckIfEnemyIsNotCuttingTrail()
     {
-        const float EnemyDistanceToCut = .2f;
         if (EnemyManager.I.Enemies == null) return;
         foreach (var enemy in EnemyManager.I.Enemies)
         {
+            if(enemy == null) continue;
+            
             for (int i = 0; i < _trailPoints.Count; i++)
             {
-                var d = Vector3.Distance(_trailPoints[i], enemy.position);
+                var d = Vector3.Distance(_trailPoints[i], enemy.transform.position);
                 if (d < EnemyDistanceToCut)
                 {
                     CutTailAtIndex(i);
                     _trailRendererCutting.Clear();
-                        Debug.Log("Bums, AI tikko man nogrieza asti, vajag feijerverķus!");
+                    Debug.LogError("@odo -- fire sparks or smtn, just lost a tail");
                 }
             }
+        }
+    }
+
+    private void CheckEnemiesInsideShape()
+    {
+        if (EnemyManager.I.Enemies == null) return;
+        
+        for(var i = 0; i < EnemyManager.I.Enemies.Count; i++)
+        {
+            if( EnemyManager.I.Enemies[i] == null) return;
+            
+            if (MyMaths.ContainsPoint(_trailPoints, EnemyManager.I.Enemies[i].transform.position))
+            {
+                EnemyManager.I.Enemies[i].Vaporize();
+            }
+
         }
     }
 }

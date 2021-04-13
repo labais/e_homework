@@ -573,6 +573,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefab: {fileID: 1905434280}
+  Enemies: []
 --- !u!1 &402127798
 GameObject:
   m_ObjectHideFlags: 0
@@ -2410,38 +2411,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 329672374, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 329672375, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_Size.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1625268984, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1625268985, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_Size.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1958496675, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1958496676, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_Size.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2082078612, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2082078613, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_Size.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5270593721470150850, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
       propertyPath: m_RootOrder
       value: 5

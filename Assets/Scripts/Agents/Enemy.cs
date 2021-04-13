@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     private Vector3 _direction;
     private Transform _transform;
     private const float MaxSpeed = .005f;
+    private bool _dead;
 
     private void Start()
     {
@@ -24,6 +25,8 @@ public class Enemy : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (_dead) return;
+        
         if ((_modeTTL -= Time.fixedDeltaTime) < 0)
         {
             _mode = (Mode) Random.Range(0, 2 + 1);
@@ -87,6 +90,14 @@ public class Enemy : MonoBehaviour
     private void AfterDeathAnimation()
     {
         Destroy(this);
+    }
+
+    public void Vaporize()
+    {
+        _dead = true;
+        Debug.LogError("@odo -- add points for killing enemy!");
+
+        AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () => { _agentEffects.AnimateDeath(AfterDeathAnimation); });
     }
 
     private enum Mode

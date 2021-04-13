@@ -8,6 +8,14 @@ public class HoleAnimator : MonoBehaviour
 {
     private static readonly int SliceAmount = Shader.PropertyToID("_SliceAmount");
 
+    public const float beamDuration = .4f;
+    const float shakeMagnitude = .3f;
+    const float minD = 10;
+    const float maxD = 20;
+    const float minL = 2;
+    const float maxL = 25;
+
+    
     void OnEnable()
     {
         Signals.Get<HoleGeneratedSignal>().AddListener(OnHoleGenerated);
@@ -21,12 +29,6 @@ public class HoleAnimator : MonoBehaviour
     private void OnHoleGenerated(Transform hole, Transform holeWall)
     {
         holeWall.localScale = new Vector3(1, 50, 1);
-        const float beamDuration = .4f;
-        const float shakeMagnitude = .3f;
-        const float minD = 10;
-        const float maxD = 20;
-        const float minL = 2;
-        const float maxL = 25;
 
         // Less shaking for holes farther from camera
         var distance = Vector3.Distance(Camera.main.transform.position, holeWall.position);
