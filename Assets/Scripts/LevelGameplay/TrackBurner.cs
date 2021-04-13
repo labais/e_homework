@@ -7,7 +7,8 @@ using UnityEngine.Serialization;
 
 public class TrackBurner : MonoBehaviour
 {
-    [SerializeField] private TrailRenderer _trailRenderer;
+    [SerializeField] private TrailRenderer _trailRendererLong;
+    [SerializeField] private TrailRenderer _trailRendererCutting;
     [SerializeField] DynamicGround _dynamicGround;
 
     private readonly List<Vector3> _trailPoints = new List<Vector3>();
@@ -15,10 +16,10 @@ public class TrackBurner : MonoBehaviour
     private Vector3 _lastPoint;
     private bool _finished;
 
-    public float TrailLengthSeconds = 50;
-    public float TrailCuttingLengthSeconds = 25;
-    public float TrailWidthFat = .1f;
-    public float TrailWidthThin = .05f;
+    private float _trailLengthSeconds = 50;
+    private  float _trailCuttingLengthSeconds = 2;
+    // public float TrailWidthFat = .1f;
+    // public float TrailWidthThin = .05f;
 
     // private readonly Vector3 DO = Vector3.up; // Debug Offset for vector drawing
     // private readonly Vector3 DO2 = Vector3.up * 0.1f;
@@ -26,19 +27,20 @@ public class TrackBurner : MonoBehaviour
     private void Start()
     {
         AddPointAndCheckIfCrossed(transform.position);
-        _trailRenderer.time = TrailLengthSeconds;
-
-        var curve = new AnimationCurve();
-        var cuttingCutoffTime = TrailCuttingLengthSeconds / TrailLengthSeconds;
-
-        curve.AddKey(0.0f, TrailWidthFat);
-        curve.AddKey(cuttingCutoffTime - .01f, TrailWidthFat);
-        curve.AddKey(cuttingCutoffTime - .02f, TrailWidthFat);
-        curve.AddKey(cuttingCutoffTime, TrailWidthThin);
-        curve.AddKey(cuttingCutoffTime + .01f, TrailWidthThin);
-        curve.AddKey(1f, TrailWidthThin);
-
-        _trailRenderer.widthCurve = curve;
+        _trailRendererLong.time = _trailLengthSeconds;
+        _trailRendererCutting.time = _trailCuttingLengthSeconds;
+        //
+        // var curve = new AnimationCurve();
+        // var cuttingCutoffTime = TrailCuttingLengthSeconds / TrailLengthSeconds;
+        //
+        // curve.AddKey(0.0f, TrailWidthFat);
+        // curve.AddKey(cuttingCutoffTime - .01f, TrailWidthFat);
+        // curve.AddKey(cuttingCutoffTime - .02f, TrailWidthFat);
+        // curve.AddKey(cuttingCutoffTime, TrailWidthThin);
+        // curve.AddKey(cuttingCutoffTime + .01f, TrailWidthThin);
+        // curve.AddKey(1f, TrailWidthThin);
+        //
+        // _trailRenderer.widthCurve = curve;
     }
 
     void OnEnable()
@@ -85,7 +87,11 @@ public class TrackBurner : MonoBehaviour
 
                 _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
-                CutTailAtIndex(i);
+                
+                // Cut off all tail
+                CutTailAtIndex(_trailPoints.Count-1);
+                _trailRendererCutting.Clear();
+
                 return;
             }
         }
@@ -105,7 +111,7 @@ public class TrackBurner : MonoBehaviour
     private void CutOffOldPoints()
     {
         var cutoffIndex = -1;
-        var cutoffTime = DateTime.Now - TimeSpan.FromSeconds(TrailCuttingLengthSeconds);
+        var cutoffTime = DateTime.Now - TimeSpan.FromSeconds(_trailCuttingLengthSeconds);
 
         for (int i = 0; i < _trailTimes.Count; i++)
         {
