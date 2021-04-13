@@ -52,17 +52,15 @@ public class PlayerController : MonoBehaviour
         if (!_dead && !_finished)
         {
             var gamepad = Gamepad.current;
-            if (gamepad == null)
+            if (gamepad != null)
             {
-                Debug.Log("no gamepad!");
+                playerInput = gamepad.leftStick.ReadValue(); // onscreen gamepad
+                playerInput += new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); // keyboard
+            } else {
+                Debug.LogError("no gamepad!");
                 return;
             }
-            
-            playerInput = gamepad.leftStick.ReadValue();
-
-#if !UNITY_EDITOR
-            playerInput += new Vector2(Random.Range(-1f,1f), 1); // fake input for build
-#endif
+    
             if (!_firstInputRecieved && playerInput.magnitude > .3f)
             {
                 _firstInputRecieved = true;

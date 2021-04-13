@@ -37,7 +37,7 @@ public class ControlScreenBehaviour : MonoBehaviour
         foreach (var image in _imagesToFade)
         {
             var color = image.color;
-            color.a = .05f;
+            color.a = .3f;
             image.DOColor(color, 1).SetEase(Ease.InCirc).SetDelay(1);
         }
     }

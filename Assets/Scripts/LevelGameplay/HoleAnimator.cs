@@ -22,7 +22,7 @@ public class HoleAnimator : MonoBehaviour
     {
         holeWall.localScale = new Vector3(1, 50, 1);
         var beamDuration = .4f;
-        var shakeMagnitude = .1f;
+        var shakeMagnitude = .3f;
 
         // Less shaking for holes farther from camera
         var distance = Vector3.Distance(Camera.main.transform.position, holeWall.position);
