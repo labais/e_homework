@@ -15,6 +15,10 @@ public class PlayerCollisionChecker : MonoBehaviour
         {
             Signals.Get<PlayerDiedSignal>().Dispatch();
         }
+        else if (other.CompareTag("EnemyForwardChecker")) // It would be much better to use separate physics layers, but this will do for now 
+        {
+            // pass
+        }
         else
         {
             Signals.Get<PlayerDiedSignal>().Dispatch();

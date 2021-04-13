@@ -8,6 +8,8 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] private GameObject _prefab;
 
+    private const float MinDistanceFromNextEnemy = .9f;
+
     private List<Transform> _enemies;
 
     private void OnEnable()
@@ -20,30 +22,37 @@ public class EnemyManager : MonoBehaviour
         Signals.Get<LevelGeneratedSignal>().RemoveListener(OnLevelGenerated);
     }
 
+    private void Start()
+    {
+        //  _prefab.SetActive(false);// ---------------------------------------------------------------------------
+    }
+
     private void OnLevelGenerated(float levelSizeX, float levelSizeZ)
     {
+        return; // ---------------------------------------------------------------------------
+
         // @todo -- parametrise depending on GameManager.I.LevelNumber 
-        var chunks = Random.Range(2, 4);
-        var maxNumPerChunk = Random.Range(1, 3);
-        
+        var chunks = Random.Range(2, 10);
+        var maxNumPerChunk = Random.Range(1, 8);
+
         _enemies = new List<Transform>();
 
         Debug.Log($"EnemyManager::chunks={chunks}");
         Debug.Log($"EnemyManager::maxNumPerChunk={maxNumPerChunk}");
-        
-        
+
         for (var i = 0; i < chunks; i++)
         {
-
             var chunkPosition = Vector3.zero;
             var foundEmptySpot = false;
-            for (var r = 0 ; r < 5; r++) { //retries to randomly find empty spot
+            for (var r = 0; r < 5; r++)
+            {
+                //retries to randomly find empty spot
                 chunkPosition = GetRandomPointOnLevel(levelSizeX, levelSizeZ);
                 var distance = GetDistanceToClosestEnemy(chunkPosition);
                 if (distance > 4)
                 {
                     foundEmptySpot = true;
-                    break; 
+                    break;
                 }
             }
 
@@ -53,21 +62,21 @@ public class EnemyManager : MonoBehaviour
                 break;
             }
 
-            var numPerChunk = (Random.Range(1, maxNumPerChunk) + Random.Range(1, maxNumPerChunk))/2;
-            
+            var numPerChunk = (Random.Range(1, maxNumPerChunk) + Random.Range(1, maxNumPerChunk)) / 2;
+
             for (var j = 0; j < numPerChunk; j++)
             {
                 var enemyPosition = chunkPosition;
-                
-                for (var r = 0 ; r < 5; r++)
+
+                for (var r = 0; r < 5; r++)
                 {
                     foundEmptySpot = false;
-                    enemyPosition = chunkPosition + new Vector3(Random.Range(-1f, 1f),0, Random.Range(-1f, 1f));
+                    enemyPosition = chunkPosition + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
                     var distance = GetDistanceToClosestEnemy(chunkPosition);
-                    if (distance > .6f)
+                    if (distance > MinDistanceFromNextEnemy)
                     {
                         foundEmptySpot = true;
-                        break; 
+                        break;
                     }
                 }
 
@@ -77,23 +86,19 @@ public class EnemyManager : MonoBehaviour
                     continue;
                 }
 
-
-                Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} enemy pos={enemyPosition}");
+                // Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} enemy pos={enemyPosition}");
                 var enemy = Instantiate(_prefab, enemyPosition, Quaternion.identity, transform);
-                
+
                 _enemies.Add(enemy.transform);
                 enemy.SetActive(true);
             }
         }
-        
-        
-        
     }
 
     Vector3 GetRandomPointOnLevel(float levelSizeX, float levelSizeZ)
     {
         var numPerChunk = Random.Range(1, 3);
-        var posX = Random.Range(1, levelSizeX);
+        var posX = Random.Range(2, levelSizeX - 2);
         var posZ = Random.Range(6, levelSizeZ - 5);
         return new Vector3(posX, 0, posZ);
     }
@@ -112,10 +117,5 @@ public class EnemyManager : MonoBehaviour
         }
 
         return maxD;
-    }
-
-    private void Start()
-    {
-        _prefab.SetActive(false);
     }
 }

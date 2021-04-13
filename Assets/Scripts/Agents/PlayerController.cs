@@ -79,11 +79,11 @@ public class PlayerController : MonoBehaviour
 
         Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * _maxSpeed;
 
-        float maxSpeedChange = _maxAcceleration * Time.deltaTime;
+        float maxSpeedChange = _maxAcceleration * Time.fixedDeltaTime;
         _velocity.x = Mathf.MoveTowards(_velocity.x, desiredVelocity.x, maxSpeedChange);
         _velocity.z = Mathf.MoveTowards(_velocity.z, desiredVelocity.z, maxSpeedChange);
 
-        Vector3 displacement = _velocity * Time.deltaTime;
+        Vector3 displacement = _velocity * Time.fixedDeltaTime;
         Vector3 newPosition = _transform.localPosition + displacement;
 
         _transform.localPosition = newPosition;

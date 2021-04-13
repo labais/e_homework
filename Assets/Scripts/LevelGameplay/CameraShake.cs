@@ -31,7 +31,7 @@ public class CameraShake : MonoBehaviour
         if (_shakeDuration > 0)
         {
             _transform.localPosition = _initialPosition + Random.insideUnitSphere * _shakeMagnitude;
-            _shakeDuration -= Time.deltaTime * _dampingSpeed;
+            _shakeDuration -= Time.fixedDeltaTime * _dampingSpeed;
         }
     }
 
