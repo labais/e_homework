@@ -28,3 +28,7 @@ public class PlayerGotHitSignal : ASignal
 public class PlayerStartedControllingSignal : ASignal
 {
 }
+
+public class DisableOnScreenGamepad : ASignal
+{
+}

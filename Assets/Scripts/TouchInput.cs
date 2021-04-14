@@ -8,10 +8,11 @@ public class TouchInput : MonoBehaviour
 
 
     public Vector3 Target { get; private set; }
-    public bool On { get; private set; }
+    public bool Started { get; private set; }
     
     private const int TestGroundLayerMask = 1 << 6;
     private Camera _camera;
+    private bool _disabled;
 
     private void Awake()
     {
@@ -20,20 +21,23 @@ public class TouchInput : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (_disabled) return;
+        
+        
         RaycastHit hit;
 
         var pressPos = Vector2.zero;
-        On = false;
+        Started = false;
 
         if (Input.touchCount > 0)
         {
             pressPos = Input.touches[0].position;
-            On = true;
+            Started = true;
         }
         else if (Input.GetMouseButton(0))
         {
             pressPos = Input.mousePosition;
-            On = true;
+            Started = true;
         }
         else
         {
@@ -46,5 +50,11 @@ public class TouchInput : MonoBehaviour
             _pointer.transform.position = hit.point;
             Target = hit.point;
         }
+    }
+
+    public void Disable()
+    {
+        _disabled = true;
+        _pointer.gameObject.SetActive(false);
     }
 }

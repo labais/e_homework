@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour
     private const int FinishedAutoMoveTTLNominal = 60;
 
     private bool _firstInputRecieved;
+    private InputMethod _selectedInputMethod = InputMethod.None;
+    
 
     private void Start()
     {
@@ -46,28 +48,37 @@ public class PlayerController : MonoBehaviour
         if (!_dead && !_finished)
         {
             var gamepad = Gamepad.current;
-            if (gamepad != null)
+            if (gamepad != null && _selectedInputMethod != InputMethod.Touch)
             {
                 // Read onscreen gamepad
                 playerInput = gamepad.leftStick.ReadValue();
+
+                if (_selectedInputMethod != InputMethod.Gamepad && playerInput.magnitude  > 0.05f)
+                {
+                    _touchInput.Disable();
+                    _selectedInputMethod = InputMethod.Gamepad;
+                }
+
             }
 
             // Read keyboard
             playerInput += new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
             // Read touch input
-            if (_touchInput.On)
+            if (_touchInput.Started && _selectedInputMethod != InputMethod.Gamepad)
             {
                 var distanceToTouchTarget = _touchInput.Target - _transform.position;
                 if (distanceToTouchTarget.magnitude > .5f)
                 {
                     playerInput += new Vector2(distanceToTouchTarget.normalized.x, distanceToTouchTarget.normalized.z);
                 }
+                
+                if (_selectedInputMethod != InputMethod.Touch)
+                {
+                    Signals.Get<DisableOnScreenGamepad>().Dispatch();
+                    _selectedInputMethod = InputMethod.Touch;
+                }
             }
-
-
-
-
 
             if (!_firstInputRecieved && playerInput.magnitude > .3f)
             {
@@ -108,5 +119,12 @@ public class PlayerController : MonoBehaviour
     {
         _finished = true;
         _finishedAutoMoveTTL = FinishedAutoMoveTTLNominal;
+    }
+
+    private enum InputMethod
+    {
+        None,
+        Touch,
+        Gamepad,
     }
 }

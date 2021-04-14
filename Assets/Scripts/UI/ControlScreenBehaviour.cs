@@ -10,6 +10,7 @@ public class ControlScreenBehaviour : MonoBehaviour
 
     private void OnEnable()
     {
+        Signals.Get<DisableOnScreenGamepad>().AddListener(Disable);
         Signals.Get<PlayerFinishedSignal>().AddListener(Stop);
         Signals.Get<PlayerDiedSignal>().AddListener(Stop);
         Signals.Get<PlayerStartedControllingSignal>().AddListener(OnPlayerStartedControlling);
@@ -17,6 +18,7 @@ public class ControlScreenBehaviour : MonoBehaviour
 
     private void OnDisable()
     {
+        Signals.Get<DisableOnScreenGamepad>().RemoveListener(Disable);
         Signals.Get<PlayerFinishedSignal>().RemoveListener(Stop);
         Signals.Get<PlayerDiedSignal>().RemoveListener(Stop);
         Signals.Get<PlayerStartedControllingSignal>().RemoveListener(OnPlayerStartedControlling);
@@ -40,5 +42,10 @@ public class ControlScreenBehaviour : MonoBehaviour
             color.a = .3f;
             image.DOColor(color, 1).SetEase(Ease.InCirc).SetDelay(1);
         }
+    }
+
+    private void Disable()
+    {
+        _content.SetActive(false);
     }
 }
