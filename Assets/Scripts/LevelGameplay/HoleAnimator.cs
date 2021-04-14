@@ -46,12 +46,12 @@ public class HoleAnimator : MonoBehaviour
         {
             holeWall.gameObject.SetActive(true);
             Signals.Get<ShakeCameraSignal>().Dispatch(beamDuration, shakeMagnitude * distanceFromCameraPenalty * lenghtBonus);
+            hole.gameObject.SetActive(true);
         });
         sequence.AppendInterval(beamDuration);
         sequence.AppendCallback(() =>
         {
             holeWall.gameObject.SetActive(false);
-            hole.gameObject.SetActive(true);
         });
         sequence.AppendCallback(() =>
         {

@@ -142,7 +142,7 @@ public class Enemy : MonoBehaviour
         {
             // Fall in the hole - get vaporized by player 
             _laserLine.gameObject.SetActive(false);
-            Debug.Log($"got triggered by {other.name} / {other.tag}", gameObject);
+            Debug.Log($"got triggered by {other.name} / {other.tag}  F={Time.frameCount}", gameObject);
             Vaporize();
         }
     }
@@ -164,7 +164,7 @@ public class Enemy : MonoBehaviour
             _laserLine.gameObject.SetActive(false);
         });
 
-        //Debug.Log("got vaporized", gameObject);
+        Debug.Log($"got vaporized F={Time.frameCount}", gameObject);
     }
 
     private enum Mode

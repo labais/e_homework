@@ -87,6 +87,8 @@ public class TrackBurner : MonoBehaviour
                 _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
 
+                
+                
                 // Cut off all tail
                 CutTailAtIndex(_trailPoints.Count - 1);
                 _trailRendererCutting.Clear();

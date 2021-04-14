@@ -22,6 +22,8 @@ public class GameDataManager : MonoBehaviour
         }
     }
 
+    public int Kills { get; private set; }
+
     public int LevelNumber { get; set; }
 
     private int _deadEnemies = 0;
@@ -51,6 +53,7 @@ public class GameDataManager : MonoBehaviour
         var deltaDeadEnemies = _deadEnemies - _deadEnemiesBefore;
         if (deltaDeadEnemies != 0)
         {
+            Kills += deltaDeadEnemies;
             _deadEnemiesBefore = _deadEnemies;
             int p;
             switch (deltaDeadEnemies)
@@ -80,6 +83,7 @@ public class GameDataManager : MonoBehaviour
 
             // Debug.Log($"deltaDeadEnemies={deltaDeadEnemies} p={p} frame={Time.frameCount}" );
             Points += p;
+            
         }
     }
 

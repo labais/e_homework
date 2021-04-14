@@ -94,6 +94,7 @@ public class DynamicGround : MonoBehaviour
         GiveHoleACollider(hole);
 
         Signals.Get<HoleGeneratedSignal>().Dispatch(hole, walls);
+        Debug.Log($"HoleGeneratedSignal F={Time.frameCount}", gameObject);
 
         _holeId++;
     }
