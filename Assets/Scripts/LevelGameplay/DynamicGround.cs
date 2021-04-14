@@ -29,6 +29,10 @@ public class DynamicGround : MonoBehaviour
 
     private void Start()
     {
+
+        zSize = GameDataManager.I.LevelNumber * 5 + 10;
+        Debug.Log($"DynamicGround zSize={zSize} L={GameDataManager.I.LevelNumber}");
+        
         _xPoints = xSize * _pointsPerUnit;
         _zPoints = zSize * _pointsPerUnit;
         _skippedQuads = new bool[_xPoints, 1, _zPoints];

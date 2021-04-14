@@ -16,10 +16,12 @@ public class Enemy : MonoBehaviour
     private Vector3 _direction;
     private Transform _transform;
 
+    private bool _aggressive;
+    private bool _fast;
     private bool _dead;
-    // private 
+    private bool _sharpshooter;
 
-    private const float MaxSpeed = .005f; // @todo -- randomize a little and seldom randomize a lot 
+    private const float MaxSpeed = .007f;
     private const float MinPlayerDistanceToShoot = 10;
 
     private void Start()
@@ -29,7 +31,24 @@ public class Enemy : MonoBehaviour
         _transform = transform;
 
         _laserLine.gameObject.SetActive(false);
-        // var lasetPoints = _laserLine.po
+        _aggressive = Random.Range(0, 100 + 1) < 1 + GameDataManager.I.LevelNumber;
+        _fast = Random.Range(0, 100 + 1) < 1 + GameDataManager.I.LevelNumber;
+        _sharpshooter = Random.Range(0, 100 + 1) < 1 + GameDataManager.I.LevelNumber;
+
+        if (_aggressive)
+        {
+            Debug.Log($"Got aggressive one! L={GameDataManager.I.LevelNumber}");
+        }
+
+        if (_fast)
+        {
+            Debug.Log($"Got fast one! L={GameDataManager.I.LevelNumber}");
+        }
+
+        if (_sharpshooter)
+        {
+            Debug.Log($"Got a sharpshooter over here L={GameDataManager.I.LevelNumber}");
+        }
     }
 
     private void FixedUpdate()
@@ -40,12 +59,10 @@ public class Enemy : MonoBehaviour
         {
             _mode = (Mode) Random.Range(0, 2 + 1);
 
-            // @todo -- parametrize this, some guys will be more aggressive
-            if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
-
-            // -------------------------------------------------------------------------------------
-            // _mode = Mode.Wait; // ------------------------------------------------------------------
-            // -------------------------------------------------------------------------------------
+            if (!_aggressive)
+            {
+                if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again for less shooty-shooty
+            }
 
             switch (_mode)
             {
@@ -73,7 +90,7 @@ public class Enemy : MonoBehaviour
 
         if (_mode == Mode.Wander)
         {
-            _transform.position += _direction * MaxSpeed;
+            _transform.position += _direction * (MaxSpeed * (_fast ? 2 : 1));
             if (!_forwardChecker.IsCool)
             {
                 _modeTTL = 0;
@@ -86,7 +103,7 @@ public class Enemy : MonoBehaviour
             _laserLine.SetPosition(0, _transform.position + Vector3.up * .7f);
             _laserLine.SetPosition(1, Player.I.transform.position + Vector3.up * .7f);
 
-            if (Vector3.Distance(_transform.position, Player.I.transform.position) > MinPlayerDistanceToShoot)
+            if (Vector3.Distance(_transform.position, Player.I.transform.position) > MinPlayerDistanceToShoot * (_sharpshooter ? 2 : 1))
             {
                 _modeTTL = -1; // do something else;
                 return;

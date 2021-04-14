@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using deVoid.Utils;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,9 @@ public class WinScreenBehaviour : MonoBehaviour
     [SerializeField] private Animator _screenAnimator;
     
     private static readonly int Open = Animator.StringToHash("Open");
-
+    
+    Sequence _sequence;
+    
     private void OnEnable()
     {
         Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
@@ -40,5 +43,10 @@ public class WinScreenBehaviour : MonoBehaviour
         _content.SetActive(true);
         _text1.text = $"Level {GameDataManager.I.LevelNumber.ToString("D2")} finished!";
         _screenAnimator.SetTrigger(Open);
+        
+        _sequence = DOTween.Sequence();
+        
+        
+        
     }
 }

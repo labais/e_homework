@@ -66,10 +66,14 @@ public class TrackBurner : MonoBehaviour
     {
         _trailPoints.Add(newPoint);
         _trailTimes.Add(DateTime.Now);
+        
+         
 
         if (_trailPoints.Count < 4) return;
         var penultimatePoint = _trailPoints[_trailPoints.Count - 2];
 
+        GameDataManager.I.TotalTrailLength += (newPoint - penultimatePoint).magnitude / 100f;
+                                              
         for (var i = 0; i < _trailPoints.Count - 2; i++)
         {
             if (MyMaths.AreLinesIntersecting(_trailPoints[i], _trailPoints[i + 1], penultimatePoint, newPoint))

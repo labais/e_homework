@@ -24,13 +24,14 @@ public class GameDataManager : MonoBehaviour
 
     public int Kills { get; private set; }
 
-    public int LevelNumber { get; set; }
+    public int LevelNumber { get; private set; }
+    public int NumberOfHoles { get; private set; }
+
+    public float TotalTrailLength { get; set; }
 
     private int _deadEnemies = 0;
     private int _deadEnemiesBefore = 0;
 
-    // private int _multiplierWindow;
-    // private const int _multiplierWindowNominal = 30;
 
     private void Awake()
     {
@@ -41,6 +42,7 @@ public class GameDataManager : MonoBehaviour
             SceneManager.sceneLoaded += OnLevelFinishedLoading;
             LevelNumber = 0;
             Signals.Get<EnemyDiedSignal>().AddListener(OnEnemyDied);
+            Signals.Get<HoleGeneratedSignal>().AddListener(OnHoleGenerated);
         }
         else
         {
@@ -83,7 +85,6 @@ public class GameDataManager : MonoBehaviour
 
             // Debug.Log($"deltaDeadEnemies={deltaDeadEnemies} p={p} frame={Time.frameCount}" );
             Points += p;
-            
         }
     }
 
@@ -97,9 +98,18 @@ public class GameDataManager : MonoBehaviour
         _deadEnemies++;
     }
 
+    private void OnHoleGenerated(Transform _, Transform __)
+    {
+        NumberOfHoles++;
+    }
+
     public void Reset()
     {
         Points = 0;
         LevelNumber = 0;
+        NumberOfHoles = 0;
+        _deadEnemies = 0;
+        _deadEnemiesBefore = 0;
+        TotalTrailLength = 0;
     }
 }
