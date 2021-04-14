@@ -38,7 +38,7 @@ public class WinScreenBehaviour : MonoBehaviour
     private void OnPlayerFinished()
     {
         _content.SetActive(true);
-        _text1.text = $"Level {GameManager.I.LevelNumber.ToString("D2")} finished!";
+        _text1.text = $"Level {GameDataManager.I.LevelNumber.ToString("D2")} finished!";
         _screenAnimator.SetTrigger(Open);
     }
 }

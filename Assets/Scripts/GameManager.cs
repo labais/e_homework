@@ -1,3 +1,4 @@
+using deVoid.Utils;
 using DG.Tweening;
 using EasyButtons;
 using UnityEngine;
@@ -6,18 +7,17 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager I { get; private set; }
-
-    public int LevelNumber { get; set; }
+    
     private int _numTimesLevelLoaded = 0;
+    
 
-    void Awake()
+    private void Awake()
     {
         if (I == null)
         {
             I = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnLevelFinishedLoading;
-            LevelNumber = 0;
         }
         else
         {
@@ -25,13 +25,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    private void OnLevelFinishedLoading(Scene arg0, LoadSceneMode arg1)
     {
-    }
-
-    void OnLevelFinishedLoading(Scene arg0, LoadSceneMode arg1)
-    {
-        LevelNumber++;
         _numTimesLevelLoaded++;
         // Debug.Log($"_numTimesLevelLoaded={_numTimesLevelLoaded} arg0={arg0} arg1={arg1}");
         // Debug.Log($"OnLevelFinishedLoading LevelNumber={LevelNumber}");
@@ -41,6 +36,7 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         DOTween.KillAll();
+        GameDataManager.I.Reset();
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -50,4 +46,6 @@ public class GameManager : MonoBehaviour
         DOTween.KillAll();
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
     }
+    
+    
 }

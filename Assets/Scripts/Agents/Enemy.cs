@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using deVoid.Utils;
 using DG.Tweening;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -40,7 +41,11 @@ public class Enemy : MonoBehaviour
             _mode = (Mode) Random.Range(0, 2 + 1);
 
             // @todo -- parametrize this, some guys will be more aggressive
-            // if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
+            if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
+
+            // -------------------------------------------------------------------------------------
+            // _mode = Mode.Wait; // ------------------------------------------------------------------
+            // -------------------------------------------------------------------------------------
 
             switch (_mode)
             {
@@ -113,6 +118,7 @@ public class Enemy : MonoBehaviour
         {
             _agentEffects.AnimateDeath(AfterDeathAnimation);
             _laserLine.gameObject.SetActive(false);
+            Debug.Log("got hit by player", gameObject);
         }
         else if (other.CompareTag("Finish"))
         {
@@ -120,16 +126,24 @@ public class Enemy : MonoBehaviour
         else if (other.CompareTag("Enemy"))
         {
         }
+        else if (other.CompareTag("Bullet"))
+        {
+        }
+        else if (other.CompareTag("Wall"))
+        {
+            // Very unlikely
+            _agentEffects.AnimateDeath(AfterDeathAnimation);
+            Debug.Log($"fell off map, lol not jk", gameObject);
+        }
         else if (other.CompareTag("EnemyForwardChecker"))
         {
-            // pass
         }
         else
         {
-            // doesn't work :\ 
-            // fall off from level (not likely, but still) (sides and holes) 
-            _agentEffects.AnimateDeath(AfterDeathAnimation);
+            // Fall in the hole - get vaporized by player 
             _laserLine.gameObject.SetActive(false);
+            Debug.Log($"got triggered by {other.name} / {other.tag}", gameObject);
+            Vaporize();
         }
     }
 
@@ -141,13 +155,16 @@ public class Enemy : MonoBehaviour
     public void Vaporize()
     {
         _dead = true;
-        Debug.LogError("@odo -- add points for killing enemy!");
+
+        Signals.Get<EnemyDiedSignal>().Dispatch();
 
         AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () =>
         {
             _agentEffects.AnimateDeath(AfterDeathAnimation);
             _laserLine.gameObject.SetActive(false);
         });
+
+        //Debug.Log("got vaporized", gameObject);
     }
 
     private enum Mode

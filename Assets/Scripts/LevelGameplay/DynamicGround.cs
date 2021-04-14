@@ -122,8 +122,9 @@ public class DynamicGround : MonoBehaviour
         {
             for (int x = 0; x <= _xPoints; x++, i++)
             {
-                if ((x > 0 && z > 0 && x < _xPoints && z < _zPoints))
+                if ((x > 0 && z > 0 && x < _xPoints-1 && z < _zPoints-1))
                 {
+                
                     if (_skippedQuads[x, 0, z] &&
                         (!_skippedQuads[x, 0, z + 1] || !_skippedQuads[x, 0, z - 1] ||
                          !_skippedQuads[x + 1, 0, z] || !_skippedQuads[x - 1, 0, z]

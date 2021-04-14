@@ -21,7 +21,6 @@ public class PlayerCollisionChecker : MonoBehaviour
         }
         else if (other.CompareTag("Bullet"))
         {
-            Debug.Log("can't hurt me nuttin");
             Signals.Get<PlayerGotHitSignal>().Dispatch();
             other.GetComponent<Bullet>()?.Hit();
         }

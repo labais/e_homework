@@ -21,7 +21,7 @@ public class TrackBurner : MonoBehaviour
 
     private float _nominalCuttingTailStartingWidth;
     private float _trailLengthSeconds = 50;
-    private float _trailCuttingLengthSeconds = 2;
+    private float _trailCuttingLengthSeconds = 20; // -------------------------------------------------------------------
 
     const float EnemyDistanceToCut = .2f;
 
@@ -59,7 +59,7 @@ public class TrackBurner : MonoBehaviour
             CutOffOldPoints();
         }
 
-        CheckIfEnemyIsNotCuttingTrail();
+        CheckIfEnemyIsCuttingTrail();
     }
 
     private void AddPointAndCheckIfCrossed(Vector3 newPoint)
@@ -82,7 +82,7 @@ public class TrackBurner : MonoBehaviour
                     // Can't have Clockwise shape, the walls then are generated inside out
                 }
 
-                CheckEnemiesInsideShape();
+                //  CheckEnemiesInsideShape();
 
                 _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
@@ -146,13 +146,13 @@ public class TrackBurner : MonoBehaviour
         CutTailAtIndex(_trailPoints.Count - 1);
         AnimateTailLost();
     }
-    
+
     private void OnPlayerDied()
     {
         AnimateTailLost();
     }
 
-    private void CheckIfEnemyIsNotCuttingTrail()
+    private void CheckIfEnemyIsCuttingTrail()
     {
         if (EnemyManager.I.Enemies == null) return;
         foreach (var enemy in EnemyManager.I.Enemies)
@@ -164,7 +164,7 @@ public class TrackBurner : MonoBehaviour
                 var d = Vector3.Distance(_trailPoints[i], enemy.transform.position);
                 if (d < EnemyDistanceToCut)
                 {
-                    CutTailAtIndex(i);
+                    CutTailAtIndex(_trailPoints.Count - 1);
                     AnimateTailLost();
                 }
             }
@@ -196,18 +196,18 @@ public class TrackBurner : MonoBehaviour
             });
     }
 
-    private void CheckEnemiesInsideShape()
-    {
-        if (EnemyManager.I.Enemies == null) return;
-
-        for (var i = 0; i < EnemyManager.I.Enemies.Count; i++)
-        {
-            if (EnemyManager.I.Enemies[i] == null) return;
-
-            if (MyMaths.ContainsPoint(_trailPoints, EnemyManager.I.Enemies[i].transform.position))
-            {
-                EnemyManager.I.Enemies[i].Vaporize();
-            }
-        }
-    }
+    // private void CheckEnemiesInsideShape()
+    // {
+    //     if (EnemyManager.I.Enemies == null) return;
+    //
+    //     for (var i = 0; i < EnemyManager.I.Enemies.Count; i++)
+    //     {
+    //         if (EnemyManager.I.Enemies[i] == null) return;
+    //
+    //         if (MyMaths.ContainsPoint(_trailPoints, EnemyManager.I.Enemies[i].transform.position))
+    //         {
+    //             EnemyManager.I.Enemies[i].Vaporize();
+    //         }
+    //     }
+    // }
 }
