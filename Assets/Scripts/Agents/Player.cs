@@ -5,19 +5,20 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public static Player I { get; private set; }
-    public Vector3 InstantMovement{ get; private set; }
+    public Vector3 InstantMovement { get; private set; }
+    public bool IsDead { get; private set; }
 
     private Transform _transform;
     private Vector3 _lastPos;
 
     [SerializeField] private AgentEffects _agentEffects;
-    
+
     private void Awake()
     {
         I = this;
         _transform = transform;
     }
-    
+
     private void OnEnable()
     {
         Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
@@ -37,7 +38,6 @@ public class Player : MonoBehaviour
     private void OnPlayerDied()
     {
         _agentEffects.AnimateDeath();
+        IsDead = true;
     }
-
-
 }

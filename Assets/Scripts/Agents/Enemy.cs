@@ -8,12 +8,15 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] private AgentEffects _agentEffects;
     [SerializeField] private EnemyForwardCollisionChecker _forwardChecker;
+    [SerializeField] private LineRenderer _laserLine;
 
     private Mode _mode;
     private float _modeTTL;
     private Vector3 _direction;
     private Transform _transform;
+
     private bool _dead;
+    // private 
 
     private const float MaxSpeed = .005f; // @todo -- randomize a little and seldom randomize a lot 
     private const float MinPlayerDistanceToShoot = 10;
@@ -23,6 +26,9 @@ public class Enemy : MonoBehaviour
         _mode = Mode.Wait;
         _modeTTL = Random.Range(.1f, 1f);
         _transform = transform;
+
+        _laserLine.gameObject.SetActive(false);
+        // var lasetPoints = _laserLine.po
     }
 
     private void FixedUpdate()
@@ -32,10 +38,10 @@ public class Enemy : MonoBehaviour
         if ((_modeTTL -= Time.fixedDeltaTime) < 0)
         {
             _mode = (Mode) Random.Range(0, 2 + 1);
-            
+
             // @todo -- parametrize this, some guys will be more aggressive
-            if(_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
-            
+            if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
+
             switch (_mode)
             {
                 case Mode.Wait:
@@ -70,18 +76,33 @@ public class Enemy : MonoBehaviour
         }
         else if (_mode == Mode.Shoot)
         {
-            if (Vector3.Distance(transform.position, Player.I.transform.position) > MinPlayerDistanceToShoot)
+            _laserLine.gameObject.SetActive(true);
+            _laserLine.SetPosition(0, _transform.position + Vector3.up * .7f);
+            _laserLine.SetPosition(1, Player.I.transform.position + Vector3.up * .7f);
+
+            if (Vector3.Distance(_transform.position, Player.I.transform.position) > MinPlayerDistanceToShoot)
             {
                 _modeTTL = -1; // do something else;
+                return;
+            }
+
+            if (Player.I.IsDead)
+            {
+                _modeTTL = -1;
                 return;
             }
 
             // at the end of aiming shoot
             if (_modeTTL <= .1f)
             {
-                BulletManager.I.Shoot(transform.position, Player.I.transform.position, Player.I.InstantMovement);
+                BulletManager.I.Shoot(_transform.position, Player.I.transform.position, Player.I.InstantMovement);
                 _modeTTL = -1;
             }
+        }
+
+        if (_mode != Mode.Shoot)
+        {
+            _laserLine.gameObject.SetActive(false);
         }
     }
 
