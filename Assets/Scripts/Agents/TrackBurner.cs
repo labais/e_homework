@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using deVoid.Utils;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -10,12 +11,15 @@ public class TrackBurner : MonoBehaviour
     [SerializeField] private TrailRenderer _trailRendererLong;
     [SerializeField] private TrailRenderer _trailRendererCutting;
     [SerializeField] DynamicGround _dynamicGround;
+    [SerializeField] Material _trailCuttingMatA;
+    [SerializeField] Material _trailCuttingMatB;
 
     private readonly List<Vector3> _trailPoints = new List<Vector3>();
     private readonly List<DateTime> _trailTimes = new List<DateTime>();
     private Vector3 _lastPoint;
     private bool _finished;
 
+    private float _nominalCuttingTailStartingWidth;
     private float _trailLengthSeconds = 50;
     private float _trailCuttingLengthSeconds = 2;
 
@@ -26,8 +30,10 @@ public class TrackBurner : MonoBehaviour
         AddPointAndCheckIfCrossed(transform.position);
         _trailRendererLong.time = _trailLengthSeconds;
         _trailRendererCutting.time = _trailCuttingLengthSeconds;
+        _nominalCuttingTailStartingWidth = _trailRendererCutting.startWidth;
+        _trailRendererCutting.material = _trailCuttingMatA;
     }
-    
+
     void OnEnable()
     {
         Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
@@ -136,8 +142,7 @@ public class TrackBurner : MonoBehaviour
     private void OnPlayerGotHit()
     {
         CutTailAtIndex(_trailPoints.Count - 1);
-        _trailRendererCutting.Clear();
-        Debug.LogError("@odo -- fire sparks or smtn, just lost a tail");
+        AnimateTailLost();
     }
 
     private void CheckIfEnemyIsNotCuttingTrail()
@@ -145,34 +150,57 @@ public class TrackBurner : MonoBehaviour
         if (EnemyManager.I.Enemies == null) return;
         foreach (var enemy in EnemyManager.I.Enemies)
         {
-            if(enemy == null) continue;
-            
+            if (enemy == null) continue;
+
             for (int i = 0; i < _trailPoints.Count; i++)
             {
                 var d = Vector3.Distance(_trailPoints[i], enemy.transform.position);
                 if (d < EnemyDistanceToCut)
                 {
                     CutTailAtIndex(i);
-                    _trailRendererCutting.Clear();
-                    Debug.LogError("@odo -- fire sparks or smtn, just lost a tail");
+                    AnimateTailLost();
                 }
             }
         }
     }
 
+    private void AnimateTailLost()
+    {
+        var t = .05f;
+        _trailRendererCutting.material = _trailCuttingMatB;
+        Sequence sequence = DOTween.Sequence();
+        sequence.AppendCallback(() => { DOVirtual.Float(.5f, 1, t, (percentage) => { _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth + (.4f * percentage); }).SetEase(Ease.InCirc); })
+            .AppendInterval(t + .01f)
+            .AppendCallback(() => { DOVirtual.Float(1, .5f, t, (percentage) => { _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth + (.4f * percentage); }).SetEase(Ease.InCirc); })
+            .AppendInterval(t + .01f)
+            .AppendCallback(() =>
+            {
+                _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth;
+                _trailRendererCutting.Clear();
+                _trailRendererCutting.material = _trailCuttingMatA;
+            })
+            .AppendInterval(t + .01f)
+            .AppendCallback(() =>
+            {
+                // better to be safe
+                _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth;
+                _trailRendererCutting.Clear();
+                _trailRendererCutting.material = _trailCuttingMatA;
+            });
+    }
+
     private void CheckEnemiesInsideShape()
     {
         if (EnemyManager.I.Enemies == null) return;
-        
-        for(var i = 0; i < EnemyManager.I.Enemies.Count; i++)
+
+        for (var i = 0; i < EnemyManager.I.Enemies.Count; i++)
         {
-            if( EnemyManager.I.Enemies[i] == null) return;
-            
+            if (EnemyManager.I.Enemies[i] == null) return;
+
             if (MyMaths.ContainsPoint(_trailPoints, EnemyManager.I.Enemies[i].transform.position))
             {
                 EnemyManager.I.Enemies[i].Vaporize();
             }
-
         }
     }
 }

@@ -142,7 +142,10 @@ public class Enemy : MonoBehaviour
         _dead = true;
         Debug.LogError("@odo -- add points for killing enemy!");
 
-        AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () => { _agentEffects.AnimateDeath(AfterDeathAnimation); });
+        AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () => {
+            _agentEffects.AnimateDeath(AfterDeathAnimation); 
+            _laserLine.gameObject.SetActive(false);
+        });
     }
 
     private enum Mode
