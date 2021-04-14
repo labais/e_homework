@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (!_firstInputRecieved && playerInput.magnitude > .3f)
+            if (!_firstInputRecieved && playerInput.magnitude > .1f)
             {
                 _firstInputRecieved = true;
                 Signals.Get<PlayerStartedControllingSignal>().Dispatch();

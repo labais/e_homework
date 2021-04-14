@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using deVoid.Utils;
 
 public class TouchInput : MonoBehaviour
 {
     [SerializeField] private Transform _pointer;
-
 
     public Vector3 Target { get; private set; }
     public bool Started { get; private set; }
@@ -18,11 +18,22 @@ public class TouchInput : MonoBehaviour
     {
         _camera = Camera.main;
     }
+    
+    private void OnEnable()
+    {
+        Signals.Get<PlayerFinishedSignal>().AddListener(Disable);
+        Signals.Get<PlayerDiedSignal>().AddListener(Disable);
+    }
+
+    private void OnDisable()
+    {
+        Signals.Get<PlayerFinishedSignal>().RemoveListener(Disable);
+        Signals.Get<PlayerDiedSignal>().RemoveListener(Disable);
+    }
 
     void FixedUpdate()
     {
         if (_disabled) return;
-        
         
         RaycastHit hit;
 
@@ -57,4 +68,5 @@ public class TouchInput : MonoBehaviour
         _disabled = true;
         _pointer.gameObject.SetActive(false);
     }
+
 }
