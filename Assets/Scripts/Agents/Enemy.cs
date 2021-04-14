@@ -32,10 +32,14 @@ public class Enemy : MonoBehaviour
         if ((_modeTTL -= Time.fixedDeltaTime) < 0)
         {
             _mode = (Mode) Random.Range(0, 2 + 1);
+            
+            // @todo -- parametrize this, some guys will be more aggressive
+            if(_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
+            
             switch (_mode)
             {
                 case Mode.Wait:
-                    _modeTTL = Random.Range(.1f, 1f);
+                    _modeTTL = Random.Range(.01f, .1f);
                     break;
                 case Mode.Wander:
                     _modeTTL = Random.Range(1f, 4f);
