@@ -76,6 +76,7 @@ public class Enemy : MonoBehaviour
         }
         else if (_mode == Mode.Shoot)
         {
+            // laser aim
             _laserLine.gameObject.SetActive(true);
             _laserLine.SetPosition(0, _transform.position + Vector3.up * .7f);
             _laserLine.SetPosition(1, Player.I.transform.position + Vector3.up * .7f);
@@ -142,8 +143,9 @@ public class Enemy : MonoBehaviour
         _dead = true;
         Debug.LogError("@odo -- add points for killing enemy!");
 
-        AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () => {
-            _agentEffects.AnimateDeath(AfterDeathAnimation); 
+        AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () =>
+        {
+            _agentEffects.AnimateDeath(AfterDeathAnimation);
             _laserLine.gameObject.SetActive(false);
         });
     }

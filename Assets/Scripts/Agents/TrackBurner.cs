@@ -38,12 +38,14 @@ public class TrackBurner : MonoBehaviour
     {
         Signals.Get<PlayerFinishedSignal>().AddListener(OnPlayerFinished);
         Signals.Get<PlayerGotHitSignal>().AddListener(OnPlayerGotHit);
+        Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
     }
 
     void OnDisable()
     {
         Signals.Get<PlayerFinishedSignal>().RemoveListener(OnPlayerFinished);
         Signals.Get<PlayerGotHitSignal>().RemoveListener(OnPlayerGotHit);
+        Signals.Get<PlayerDiedSignal>().RemoveListener(OnPlayerDied);
     }
 
     void FixedUpdate()
@@ -142,6 +144,11 @@ public class TrackBurner : MonoBehaviour
     private void OnPlayerGotHit()
     {
         CutTailAtIndex(_trailPoints.Count - 1);
+        AnimateTailLost();
+    }
+    
+    private void OnPlayerDied()
+    {
         AnimateTailLost();
     }
 

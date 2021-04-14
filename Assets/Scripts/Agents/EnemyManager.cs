@@ -77,7 +77,7 @@ public class EnemyManager : MonoBehaviour
                 for (var r = 0; r < 5; r++)
                 {
                     foundEmptySpot = false;
-                    enemyPosition = chunkPosition + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+                    enemyPosition = chunkPosition + new Vector3(Random.Range(-1.5f, 1.5f), 0, Random.Range(-1.5f, 1.5f));
                     var distance = GetDistanceToClosestEnemy(chunkPosition);
                     if (distance > MinDistanceFromNextEnemy)
                     {

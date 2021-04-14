@@ -5,22 +5,16 @@ using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
-    [FormerlySerializedAs("maxSpeed")] [SerializeField, Range(0f, 100f)]
-    float _maxSpeed = 10f;
-
-    [FormerlySerializedAs("maxAcceleration")] [SerializeField, Range(0f, 100f)]
-    float _maxAcceleration = 10f;
-
-    [FormerlySerializedAs("maxStickAngle")] [SerializeField, Range(0f, 100f)]
-    float _maxStickAngle = 10f;
-
-    [FormerlySerializedAs("stickContainer")] [SerializeField]
-    Transform _stickContainer;
+    [SerializeField] float _maxSpeed = 10f;
+    [SerializeField] float _maxAcceleration = 10f;
+    [SerializeField] float _maxStickAngle = 10f;
+    [SerializeField] Transform _stickContainer;
+    [SerializeField] TouchInput _touchInput;
 
     private Vector3 _velocity;
     private Transform _transform;
     private bool _dead;
-    
+
     private bool _finished;
     private int _finishedAutoMoveTTL;
     private Vector3 _lastInput;
@@ -54,13 +48,27 @@ public class PlayerController : MonoBehaviour
             var gamepad = Gamepad.current;
             if (gamepad != null)
             {
-                playerInput = gamepad.leftStick.ReadValue(); // onscreen gamepad
-                playerInput += new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); // keyboard
-            } else {
-                Debug.LogError("no gamepad!");
-                return;
+                // Read onscreen gamepad
+                playerInput = gamepad.leftStick.ReadValue();
             }
-    
+
+            // Read keyboard
+            playerInput += new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+            // Read touch input
+            if (_touchInput.On)
+            {
+                var distanceToTouchTarget = _touchInput.Target - _transform.position;
+                if (distanceToTouchTarget.magnitude > .5f)
+                {
+                    playerInput += new Vector2(distanceToTouchTarget.normalized.x, distanceToTouchTarget.normalized.z);
+                }
+            }
+
+
+
+
+
             if (!_firstInputRecieved && playerInput.magnitude > .3f)
             {
                 _firstInputRecieved = true;
@@ -74,7 +82,7 @@ public class PlayerController : MonoBehaviour
         if (_finished && _finishedAutoMoveTTL-- > 0)
         {
             // continue last input before finishing, but slow it down
-            playerInput = _lastInput * Mathf.Lerp(.1f, 0, 1- ((float)_finishedAutoMoveTTL / FinishedAutoMoveTTLNominal));
+            playerInput = _lastInput * Mathf.Lerp(.1f, 0, 1 - ((float) _finishedAutoMoveTTL / FinishedAutoMoveTTLNominal));
         }
 
         Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * _maxSpeed;

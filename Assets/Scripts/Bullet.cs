@@ -32,7 +32,6 @@ public class Bullet : MonoBehaviour
         _speed = Mathf.Clamp(_speed, NormalSpeedA, NormalSpeedB); // don't let the speed get ridiculous
 
         _direction = (believedLocationInFuture - start).normalized;
-        Debug.LogError("@todo -- particle FX for shooting!");
     }
 
     private void FixedUpdate()
