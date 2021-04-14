@@ -52,4 +52,15 @@ public class Bullet : MonoBehaviour
             Free = true;
         }
     }
+
+    public void Hit()
+    {
+        // move away from camera, let trail disappear, then disable, not the best solution, but will do
+        transform.position = Vector3.back * 1000;
+        AsyncManager.I.Delay(TimeSpan.FromSeconds(2), ()=>{
+            gameObject.SetActive(false);
+            Free = true;
+        });
+        
+    }
 }

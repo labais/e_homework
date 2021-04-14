@@ -22,11 +22,13 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
+        Signals.Get<PlayerGotHitSignal>().AddListener(OnPlayerGotHit);
     }
 
     private void OnDisable()
     {
         Signals.Get<PlayerDiedSignal>().RemoveListener(OnPlayerDied);
+        Signals.Get<PlayerGotHitSignal>().RemoveListener(OnPlayerGotHit);
     }
 
     private void FixedUpdate()
@@ -39,5 +41,10 @@ public class Player : MonoBehaviour
     {
         _agentEffects.AnimateDeath();
         IsDead = true;
+    }
+
+    private void OnPlayerGotHit()
+    {
+        _agentEffects.PlayHitParticles();
     }
 }

@@ -23,6 +23,7 @@ public class PlayerCollisionChecker : MonoBehaviour
         {
             Debug.Log("can't hurt me nuttin");
             Signals.Get<PlayerGotHitSignal>().Dispatch();
+            other.GetComponent<Bullet>()?.Hit();
         }
         else
         {

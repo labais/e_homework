@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour
             _mode = (Mode) Random.Range(0, 2 + 1);
 
             // @todo -- parametrize this, some guys will be more aggressive
-            if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
+            // if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again
 
             switch (_mode)
             {
@@ -111,6 +111,7 @@ public class Enemy : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             _agentEffects.AnimateDeath(AfterDeathAnimation);
+            _laserLine.gameObject.SetActive(false);
         }
         else if (other.CompareTag("Finish"))
         {
@@ -127,6 +128,7 @@ public class Enemy : MonoBehaviour
             // doesn't work :\ 
             // fall off from level (not likely, but still) (sides and holes) 
             _agentEffects.AnimateDeath(AfterDeathAnimation);
+            _laserLine.gameObject.SetActive(false);
         }
     }
 

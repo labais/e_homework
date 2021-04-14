@@ -234,6 +234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5b449fe0524ea4c8dfe6668c0bdd5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gotHitParticles: {fileID: 0}
 --- !u!1 &7078028538273524167
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,7 +317,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.015151978
         inSlope: 0
         outSlope: 0
         tangentMode: 0

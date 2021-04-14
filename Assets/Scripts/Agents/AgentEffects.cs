@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class AgentEffects : MonoBehaviour
 {
+    [SerializeField] private ParticleSystem _gotHitParticles;
+    
     private static readonly int SliceAmount = Shader.PropertyToID("_SliceAmount");
     private const float DurationSec = 3;
+    
 
     public void AnimateDeath(Action callback = null)
     {
@@ -27,5 +30,10 @@ public class AgentEffects : MonoBehaviour
         }
 
         AsyncManager.I.Delay(TimeSpan.FromSeconds(DurationSec + .01f), () => { callback.TryInvoke(); });
+    }
+
+    public void PlayHitParticles()
+    {
+        _gotHitParticles.Play();
     }
 }

@@ -1414,7 +1414,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 63
   orthographic: 0
   orthographic size: 12
   m_Depth: -1
@@ -2472,10 +2472,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 757380251}
     m_Modifications:
-    - target: {fileID: 1150093067984646084, guid: 15b6c3fb7508aa743ad148d80bde2cff, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 1150093068215347920, guid: 15b6c3fb7508aa743ad148d80bde2cff, type: 3}
       propertyPath: m_Name
       value: Bullet
@@ -2494,7 +2490,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1150093068215347923, guid: 15b6c3fb7508aa743ad148d80bde2cff, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -4.86
       objectReference: {fileID: 0}
     - target: {fileID: 1150093068215347923, guid: 15b6c3fb7508aa743ad148d80bde2cff, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2590,14 +2586,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 71562602}
     m_Modifications:
-    - target: {fileID: 3543007115214920960, guid: 0066220856990704aab64618d42e2ef3, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3543007115214920960, guid: 0066220856990704aab64618d42e2ef3, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
-      value: 0.015151978
-      objectReference: {fileID: 0}
     - target: {fileID: 5697173956140648556, guid: 0066220856990704aab64618d42e2ef3, type: 3}
       propertyPath: m_RootOrder
       value: 0
