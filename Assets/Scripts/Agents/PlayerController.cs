@@ -1,32 +1,35 @@
 using deVoid.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] float _maxSpeed = 10f;
-    [SerializeField] float _maxAcceleration = 10f;
-    [SerializeField] float _maxStickAngle = 10f;
-    [SerializeField] Transform _stickContainer;
-    [SerializeField] TouchInput _touchInput;
+    [SerializeField] private Transform _stickContainer;
+    [SerializeField] private TouchInput _touchInput;
+
+    private const int FinishedAutoMoveTTLNominal = 60;
+    private const float MaxAcceleration = 64;
+    private const float MaxStickAngle = 10f;
 
     private Vector3 _velocity;
     private Transform _transform;
     private bool _dead;
-
     private bool _finished;
     private int _finishedAutoMoveTTL;
     private Vector3 _lastInput;
-    private const int FinishedAutoMoveTTLNominal = 60;
+    private float _maxSpeedBase = 7;
+    private float _maxSpeed;
+
 
     private bool _firstInputRecieved;
     private InputMethod _selectedInputMethod = InputMethod.None;
-    
 
     private void Start()
     {
         _transform = transform;
+        _maxSpeed = _maxSpeedBase + (GameDataManager.I.GetUpgrade(UpgradeType.Speed) * .6f);
+
+        Debug.Log($"Maxspeed={_maxSpeed} sec lvl={GameDataManager.I.GetUpgrade(UpgradeType.Speed)}");
     }
 
     void OnEnable()
@@ -53,12 +56,11 @@ public class PlayerController : MonoBehaviour
                 // Read onscreen gamepad
                 playerInput = gamepad.leftStick.ReadValue();
 
-                if (_selectedInputMethod != InputMethod.Gamepad && playerInput.magnitude  > 0.05f)
+                if (_selectedInputMethod != InputMethod.Gamepad && playerInput.magnitude > 0.05f)
                 {
                     _touchInput.Disable();
                     _selectedInputMethod = InputMethod.Gamepad;
                 }
-
             }
 
             // Read keyboard
@@ -72,7 +74,7 @@ public class PlayerController : MonoBehaviour
                 {
                     playerInput += new Vector2(distanceToTouchTarget.normalized.x, distanceToTouchTarget.normalized.z);
                 }
-                
+
                 if (_selectedInputMethod != InputMethod.Touch)
                 {
                     Signals.Get<DisableOnScreenGamepad>().Dispatch();
@@ -98,7 +100,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * _maxSpeed;
 
-        float maxSpeedChange = _maxAcceleration * Time.fixedDeltaTime;
+        float maxSpeedChange = MaxAcceleration * Time.fixedDeltaTime;
         _velocity.x = Mathf.MoveTowards(_velocity.x, desiredVelocity.x, maxSpeedChange);
         _velocity.z = Mathf.MoveTowards(_velocity.z, desiredVelocity.z, maxSpeedChange);
 
@@ -107,7 +109,7 @@ public class PlayerController : MonoBehaviour
 
         _transform.localPosition = newPosition;
 
-        _stickContainer.eulerAngles = new Vector3(_velocity.z / _maxSpeed * _maxStickAngle, 0, _velocity.x / _maxSpeed * _maxStickAngle);
+        _stickContainer.eulerAngles = new Vector3(_velocity.z / _maxSpeed * MaxStickAngle, 0, _velocity.x / _maxSpeed * MaxStickAngle);
     }
 
     private void OnPlayerDied()

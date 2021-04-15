@@ -20,7 +20,8 @@ public class TrackBurner : MonoBehaviour
 
     private float _nominalCuttingTailStartingWidth;
     private float _trailLengthSeconds = 50;
-    private float _trailCuttingLengthSeconds = 1.5f;
+    private float _trailCuttingLengthSecondsBase = 1.5f;
+    private float _trailCuttingLengthSeconds;
 
     const float EnemyDistanceToCut = .2f;
 
@@ -28,9 +29,12 @@ public class TrackBurner : MonoBehaviour
     {
         AddPointAndCheckIfCrossed(transform.position);
         _trailRendererLong.time = _trailLengthSeconds;
+        _trailCuttingLengthSeconds = _trailCuttingLengthSecondsBase + (GameDataManager.I.GetUpgrade(UpgradeType.TrailLength) * .08f);
         _trailRendererCutting.time = _trailCuttingLengthSeconds;
         _nominalCuttingTailStartingWidth = _trailRendererCutting.startWidth;
         _trailRendererCutting.material = _trailCuttingMatA;
+
+        Debug.Log($"Trail len={_trailRendererCutting.time} sec lvl={GameDataManager.I.GetUpgrade(UpgradeType.TrailLength)}");
     }
 
     void OnEnable()
@@ -65,12 +69,12 @@ public class TrackBurner : MonoBehaviour
     {
         _trailPoints.Add(newPoint);
         _trailTimes.Add(DateTime.Now);
-        
+
         if (_trailPoints.Count < 4) return;
         var penultimatePoint = _trailPoints[_trailPoints.Count - 2];
 
         GameDataManager.I.TotalTrailLength += (newPoint - penultimatePoint).magnitude / 100f;
-                                              
+
         for (var i = 0; i < _trailPoints.Count - 2; i++)
         {
             if (MyMaths.AreLinesIntersecting(_trailPoints[i], _trailPoints[i + 1], penultimatePoint, newPoint))
@@ -83,13 +87,9 @@ public class TrackBurner : MonoBehaviour
                     // Can't have Clockwise shape, the walls then are generated inside out
                 }
 
-                //  CheckEnemiesInsideShape();
-
                 _dynamicGround.UpdateGround(shapePoints);
                 DrawArea(i);
 
-                
-                
                 // Cut off all tail
                 CutTailAtIndex(_trailPoints.Count - 1);
                 _trailRendererCutting.Clear();
@@ -146,6 +146,8 @@ public class TrackBurner : MonoBehaviour
 
     private void OnPlayerGotHit()
     {
+        if (GameDataManager.I.GetUpgrade(UpgradeType.ImmunityBalls) > 0) return;
+
         CutTailAtIndex(_trailPoints.Count - 1);
         AnimateTailLost();
     }
@@ -157,7 +159,9 @@ public class TrackBurner : MonoBehaviour
 
     private void CheckIfEnemyIsCuttingTrail()
     {
+        if (GameDataManager.I.GetUpgrade(UpgradeType.ImmunityTrailCut) > 0) return;
         if (EnemyManager.I.Enemies == null) return;
+
         foreach (var enemy in EnemyManager.I.Enemies)
         {
             if (enemy == null) continue;
@@ -179,9 +183,21 @@ public class TrackBurner : MonoBehaviour
         var t = .05f;
         _trailRendererCutting.material = _trailCuttingMatB;
         Sequence sequence = DOTween.Sequence();
-        sequence.AppendCallback(() => { DOVirtual.Float(.5f, 1, t, (percentage) => { _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth + (.4f * percentage); }).SetEase(Ease.InCirc); })
+        sequence.AppendCallback(() =>
+            {
+                DOVirtual.Float(.5f, 1, t, (percentage) =>
+                {
+                    _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth + (.4f * percentage);
+                }).SetEase(Ease.InCirc);
+            })
             .AppendInterval(t + .01f)
-            .AppendCallback(() => { DOVirtual.Float(1, .5f, t, (percentage) => { _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth + (.4f * percentage); }).SetEase(Ease.InCirc); })
+            .AppendCallback(() =>
+            {
+                DOVirtual.Float(1, .5f, t, (percentage) =>
+                {
+                    _trailRendererCutting.startWidth = _nominalCuttingTailStartingWidth + (.4f * percentage);
+                }).SetEase(Ease.InCirc);
+            })
             .AppendInterval(t + .01f)
             .AppendCallback(() =>
             {
@@ -198,19 +214,4 @@ public class TrackBurner : MonoBehaviour
                 _trailRendererCutting.material = _trailCuttingMatA;
             });
     }
-
-    // private void CheckEnemiesInsideShape()
-    // {
-    //     if (EnemyManager.I.Enemies == null) return;
-    //
-    //     for (var i = 0; i < EnemyManager.I.Enemies.Count; i++)
-    //     {
-    //         if (EnemyManager.I.Enemies[i] == null) return;
-    //
-    //         if (MyMaths.ContainsPoint(_trailPoints, EnemyManager.I.Enemies[i].transform.position))
-    //         {
-    //             EnemyManager.I.Enemies[i].Vaporize();
-    //         }
-    //     }
-    // }
 }

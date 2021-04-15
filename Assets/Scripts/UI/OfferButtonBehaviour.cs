@@ -49,22 +49,22 @@ public class OfferButtonBehaviour : MonoBehaviour
         switch (data.UpgradeType)
         {
             case UpgradeType.Speed:
-                _text.text = $"Upgrade speed to level {(GameDataManager.I.Upgrades[(int) UpgradeType.Speed] + 2).ToString()}";
+                _text.text = $"Upgrade speed to level {(GameDataManager.I.GetUpgrade(UpgradeType.Speed) + 2).ToString()}";
                 break;
             case UpgradeType.TrailLength:
-                _text.text = $"Upgrade trail length to level {(GameDataManager.I.Upgrades[(int) UpgradeType.Speed] + 2).ToString()}";
+                _text.text = $"Upgrade trail length to level {(GameDataManager.I.GetUpgrade(UpgradeType.TrailLength) + 2).ToString()}";
                 break;
             case UpgradeType.ExtraLives:
                 _text.text = $"Buy a bonus life";
                 break;
             case UpgradeType.ImmunityBalls:
-                _text.text = $"Buy immunity from balls";
+                _text.text = $"Buy immunity to balls";
                 break;
             case UpgradeType.ImmunityTrailCut:
-                _text.text = $"Buy immunity from trail cuts";
+                _text.text = $"Buy immunity to trail cuts";
                 break;
             case UpgradeType.ImmunityEnemies:
-                _text.text = $"Buy immunity from enemies";
+                _text.text = $"Buy immunity to enemies";
                 break;
         }
 

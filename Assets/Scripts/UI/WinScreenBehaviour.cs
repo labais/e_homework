@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using deVoid.Utils;
-using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,9 +44,14 @@ public class WinScreenBehaviour : MonoBehaviour
         var type = GetRandomUpgradeToBuyThatIsNotAlreadyUpgradedToMaxLevel();
         var price = GameDataManager.I.GetUpgradePriceForNextLevelOfType(type);
         var actualPrice = price;
-        if (Random.Range(0, 10 + 1) == 0)
+        var r = Random.Range(0, 1f);
+        if (r < .04f)
         {
-            actualPrice /= 5;
+            actualPrice = price / 5;
+        }
+        else if (r < .1f)
+        {
+            actualPrice = price / 2;
         }
 
         _offerButton.Redraw(new OfferButtonData()
@@ -63,11 +65,9 @@ public class WinScreenBehaviour : MonoBehaviour
 
     private void Buy(UpgradeType boughtType, int price)
     {
-        Debug.Log($"tipa nopērk {boughtType} par {price}");
-        GameDataManager.I.Upgrades[(int)boughtType]++;
-        GameDataManager.I.LastKillStatus = "Have fun!";
+        GameDataManager.I.IncrementUpgrade(boughtType);
+        GameDataManager.I.LastKillStatus = Random.Range(0, 10 + 1) == 0 ? "Go nuts!" : "Have fun!";
         GameDataManager.I.Points -= price;
-        // OnNextLevelClick();
     }
 
     private UpgradeType GetRandomUpgradeToBuyThatIsNotAlreadyUpgradedToMaxLevel()

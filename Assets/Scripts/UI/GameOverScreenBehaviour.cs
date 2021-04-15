@@ -32,12 +32,12 @@ public class GameOverScreenBehaviour : MonoBehaviour
 
     private void OnEnable()
     {
-        Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
+        Signals.Get<MustShowGameOverSignal>().AddListener(TurnOn);
     }
 
     private void OnDisable()
     {
-        Signals.Get<PlayerDiedSignal>().RemoveListener(OnPlayerDied);
+        Signals.Get<MustShowGameOverSignal>().RemoveListener(TurnOn);
     }
 
     private void Awake()
@@ -58,13 +58,14 @@ public class GameOverScreenBehaviour : MonoBehaviour
     private void OnRestartClick()
     {
         GameManager.I.RestartGame();
+        SoundManager.I.Play("click", 1, true);
     }
 
-    private void OnPlayerDied()
+    private void TurnOn()
     {
         _content.SetActive(true);
         _screenAnimator.SetTrigger(Open);
-        
+
         // "for loops" ? never heard of those
 
         _textKillsRt.anchoredPosition3D = _textKillsOrigPos + Vector3.right * (MoveToSide);
@@ -86,72 +87,86 @@ public class GameOverScreenBehaviour : MonoBehaviour
         _sequence.AppendCallback(() =>
         {
             _textKillsRt.gameObject.SetActive(true);
-            DOVirtual.Float(1, 0, .7f, (percentage) => { _textKillsRt.anchoredPosition3D = _textKillsOrigPos + Vector3.right * (MoveToSide * percentage); }).SetEase(Ease.OutBack);
+            DOVirtual.Float(1, 0, .7f, (percentage) =>
+            {
+                _textKillsRt.anchoredPosition3D = _textKillsOrigPos + Vector3.right * (MoveToSide * percentage);
+            }).SetEase(Ease.OutBack);
         });
         _sequence.AppendInterval(.5f);
 
-        _sequence.AppendCallback(() => { 
+        _sequence.AppendCallback(() =>
+        {
             DOVirtual.Float(0, 1, 1, (percentage) =>
             {
                 var n = Mathf.RoundToInt(GameDataManager.I.Kills * percentage);
                 _textKills.text = $"Total kills: {n}";
-            }).SetEase(Ease.InSine); 
+            }).SetEase(Ease.InSine);
         });
-        
-        
+
         _sequence.AppendInterval(.5f);
 
         _sequence.AppendCallback(() =>
         {
             _textLevelRt.gameObject.SetActive(true);
-            DOVirtual.Float(1, 0, .7f, (percentage) => { _textLevelRt.anchoredPosition3D = _textLevelsOrigPos + Vector3.right * (MoveToSide * percentage); }).SetEase(Ease.OutBack);
+            DOVirtual.Float(1, 0, .7f, (percentage) =>
+            {
+                _textLevelRt.anchoredPosition3D = _textLevelsOrigPos + Vector3.right * (MoveToSide * percentage);
+            }).SetEase(Ease.OutBack);
         });
-        
+
         _sequence.AppendInterval(.5f);
 
-        _sequence.AppendCallback(() => { 
+        _sequence.AppendCallback(() =>
+        {
             DOVirtual.Float(0, 1, 1, (percentage) =>
             {
                 var n = Mathf.RoundToInt(GameDataManager.I.LevelNumber * percentage);
                 _textLevel.text = $"Max level: {n}";
-            }).SetEase(Ease.InSine); 
+            }).SetEase(Ease.InSine);
         });
-        
-        
+
         _sequence.AppendInterval(.5f);
 
         _sequence.AppendCallback(() =>
         {
             _textHolesRt.gameObject.SetActive(true);
-            DOVirtual.Float(1, 0, .7f, (percentage) => { _textHolesRt.anchoredPosition3D = _textHolesOrigPos + Vector3.right * (MoveToSide * percentage); }).SetEase(Ease.OutBack);
+            DOVirtual.Float(1, 0, .7f, (percentage) =>
+            {
+                _textHolesRt.anchoredPosition3D = _textHolesOrigPos + Vector3.right * (MoveToSide * percentage);
+            }).SetEase(Ease.OutBack);
         });
-        
+
         _sequence.AppendInterval(.5f);
 
-        _sequence.AppendCallback(() => { 
+        _sequence.AppendCallback(() =>
+        {
             DOVirtual.Float(0, 1, 1, (percentage) =>
             {
                 var n = Mathf.RoundToInt(GameDataManager.I.NumberOfHoles * percentage);
                 _textHoles.text = $"Number of holes cut: {n}";
-            }).SetEase(Ease.InSine); 
+            }).SetEase(Ease.InSine);
         });
-        
+
         _sequence.AppendInterval(.5f);
 
         _sequence.AppendCallback(() =>
         {
             _textTrailRt.gameObject.SetActive(true);
-            DOVirtual.Float(1, 0, .7f, (percentage) => { _textTrailRt.anchoredPosition3D = _textTrailOrigPos + Vector3.right * (MoveToSide * percentage); }).SetEase(Ease.OutBack);
+            DOVirtual.Float(1, 0, .7f, (percentage) =>
+            {
+                _textTrailRt.anchoredPosition3D = _textTrailOrigPos + Vector3.right * (MoveToSide * percentage);
+            }).SetEase(Ease.OutBack);
         });
-        
+
         _sequence.AppendInterval(.5f);
 
-        _sequence.AppendCallback(() => { 
+        _sequence.AppendCallback(() =>
+        {
             DOVirtual.Float(0, 1, 1, (percentage) =>
             {
-                var n =(GameDataManager.I.TotalTrailLength * percentage);
+                var n = (GameDataManager.I.TotalTrailLength * percentage);
                 _textTrail.text = $"Total trail length: {n:0.0}m";
-            }).SetEase(Ease.InSine); 
+            }).SetEase(Ease.InSine);
         });
     }
 }

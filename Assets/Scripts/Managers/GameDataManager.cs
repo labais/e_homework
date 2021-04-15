@@ -24,19 +24,17 @@ public class GameDataManager : MonoBehaviour
 
     public int Kills { get; private set; }
     public string LastKillStatus { get; set; }
-
     public int LevelNumber { get; private set; }
     public int NumberOfHoles { get; private set; }
-
     public float TotalTrailLength { get; set; }
 
     private int _deadEnemies = 0;
     private int _deadEnemiesBefore = 0;
     private bool _goldenKIll;
 
-    public int[] Upgrades;
-    public int[] MaxLevelForUpgrades;
-    public int NumUpgrades { get; private set; }
+    private int[] _upgrades;
+    private readonly int[] _maxLevelForUpgrades = GenerateMaxUpgradeLevelData();
+    public readonly int NumUpgrades = Enum.GetNames(typeof(UpgradeType)).Length;
 
     private void Awake()
     {
@@ -45,14 +43,12 @@ public class GameDataManager : MonoBehaviour
             I = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnLevelFinishedLoading;
-            LevelNumber = 0;
+           
             Signals.Get<EnemyDiedSignal>().AddListener(OnEnemyDied);
             Signals.Get<HoleGeneratedSignal>().AddListener(OnHoleGenerated);
+            Signals.Get<PlayerDiedSignal>().AddListener(OnPlayerDied);
 
-            NumUpgrades = Enum.GetNames(typeof(UpgradeType)).Length;
-            Upgrades = new int[NumUpgrades];
-
-            MaxLevelForUpgrades = GenerateMaxUpgradeLevelData();
+            ResetData();
         }
         else
         {
@@ -99,7 +95,6 @@ public class GameDataManager : MonoBehaviour
             if (deltaDeadEnemies > 1) LastKillStatus = "Multikill!";
             if (deltaDeadEnemies > 3) LastKillStatus = "Megakill!";
             if (deltaDeadEnemies > 4) LastKillStatus = "Hyperkill!!!";
-            //@todo golden     
 
             if (_goldenKIll)
             {
@@ -107,9 +102,6 @@ public class GameDataManager : MonoBehaviour
                 LastKillStatus = $"Golden {LastKillStatus}";
             }
 
-            p *= 1000;// -----------------------------------------------
-            Debug.LogWarning("DEBUGSHIT");
-            
             Points += p;
         }
     }
@@ -125,12 +117,29 @@ public class GameDataManager : MonoBehaviour
         _goldenKIll = golden;
     }
 
+    private void OnPlayerDied()
+    {
+        if (!Player.I.HasMoved)
+        {
+            Signals.Get<MustShowRestartSignal>().Dispatch(true);
+        }
+        else if (GetUpgrade(UpgradeType.ExtraLives) > 0)
+        {
+            _upgrades[(int) UpgradeType.ExtraLives]--;
+            Signals.Get<MustShowRestartSignal>().Dispatch(false);
+        }
+        else
+        {
+            Signals.Get<MustShowGameOverSignal>().Dispatch();
+        }
+    }
+
     private void OnHoleGenerated(Transform _, Transform __)
     {
         NumberOfHoles++;
     }
 
-    public void Reset()
+    public void ResetData()
     {
         Points = 0;
         LevelNumber = 0;
@@ -138,11 +147,24 @@ public class GameDataManager : MonoBehaviour
         _deadEnemies = 0;
         _deadEnemiesBefore = 0;
         TotalTrailLength = 0;
+        LevelNumber = 0;
+        _upgrades = new int[NumUpgrades];
+    }
+
+    public void IncrementUpgrade(UpgradeType type)
+    {
+        _upgrades[(int) type]++;
+        Signals.Get<UpgradesChangedSignal>().Dispatch();
+    }
+
+    public int GetUpgrade(UpgradeType type)
+    {
+        return _upgrades[(int) type];
     }
 
     public bool IsUpgradeAtMaxLevel(UpgradeType type)
     {
-        return Upgrades[(int) type] >= MaxLevelForUpgrades[(int) type];
+        return _upgrades[(int) type] >= _maxLevelForUpgrades[(int) type];
     }
 
     public int GetUpgradePriceForNextLevelOfType(UpgradeType type)
@@ -150,34 +172,40 @@ public class GameDataManager : MonoBehaviour
         switch (type)
         {
             case UpgradeType.Speed:
-                return (Upgrades[(int) UpgradeType.Speed] + 1) * 20;
+                return (_upgrades[(int) UpgradeType.Speed] + 1) * 20;
             case UpgradeType.TrailLength:
-                return (Upgrades[(int) UpgradeType.TrailLength] + 1) * 20;
+                return (_upgrades[(int) UpgradeType.TrailLength] + 1) * 20;
             case UpgradeType.ExtraLives:
-                return 100 + (Upgrades[(int) UpgradeType.ExtraLives] + 1) * 200;
+                return 100 + (_upgrades[(int) UpgradeType.ExtraLives] + 1) * 200;
             case UpgradeType.ImmunityBalls:
                 return 500;
             case UpgradeType.ImmunityTrailCut:
                 return 500;
             case UpgradeType.ImmunityEnemies:
-                return 1000;
+                return 2000;
         }
 
         return 0;
     }
 
-    private int[] GenerateMaxUpgradeLevelData()
+    private static int[] GenerateMaxUpgradeLevelData()
     {
         return new[]
         {
             0,
-            9,
-            9,
+            19,
+            19,
             2,
             1,
             1,
             1,
         };
+    }
+    
+    [Button]
+    public void GiveMoney()
+    {
+        Points += 1000;
     }
 }
 

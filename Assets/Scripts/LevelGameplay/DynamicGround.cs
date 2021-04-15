@@ -31,11 +31,8 @@ public class DynamicGround : MonoBehaviour
     private void Start()
     {
 
-        zSize = GameDataManager.I.LevelNumber * 5 + 10;
-        
-        zSize = 20;
-        Debug.LogWarning("DEBUGSHIT");
-        
+        zSize = GameDataManager.I.LevelNumber * 3 + 10;
+                
         Debug.Log($"DynamicGround zSize={zSize} L={GameDataManager.I.LevelNumber}");
         
         _xPoints = xSize * _pointsPerUnit;

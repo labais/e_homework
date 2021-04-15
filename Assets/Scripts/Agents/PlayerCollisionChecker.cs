@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using deVoid.Utils;
 using UnityEngine;
 
@@ -13,6 +11,11 @@ public class PlayerCollisionChecker : MonoBehaviour
         }
         else if (other.CompareTag("Enemy"))
         {
+            if (GameDataManager.I.GetUpgrade(UpgradeType.ImmunityEnemies) > 0)
+            {
+                return;
+            }
+
             Signals.Get<PlayerDiedSignal>().Dispatch();
         }
         else if (other.CompareTag("EnemyForwardChecker")) // It would be much better to use separate physics layers, but this will do for now 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using deVoid.Utils;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
 public class EnemyManager : MonoBehaviour
@@ -111,7 +110,7 @@ public class EnemyManager : MonoBehaviour
 
     private float GetDistanceToClosestEnemy(Vector3 pos)
     {
-        var maxD = float.MaxValue;
+        var closestDist = float.MaxValue;
         float d;
         
         foreach (var enemy in Enemies)
@@ -119,20 +118,20 @@ public class EnemyManager : MonoBehaviour
             if(enemy == null) continue;
             
             d = Vector3.Distance(pos, enemy.transform.position);
-            if (d < maxD)
+            if (d < closestDist)
             {
-                maxD = d;
+                closestDist = d;
             }
         }
         
         // also check player
         d = Vector3.Distance(pos, Player.I.transform.position);
-        if (d < maxD)
+        if (d < closestDist)
         {
-            maxD = d;
+            closestDist = d;
         }
         
 
-        return maxD;
+        return closestDist;
     }
 }

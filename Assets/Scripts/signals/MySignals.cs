@@ -17,6 +17,14 @@ public class PlayerDiedSignal : ASignal
 {
 }
 
+public class MustShowGameOverSignal : ASignal
+{
+}
+
+public class MustShowRestartSignal : ASignal<bool>
+{
+}
+
 public class PlayerFinishedSignal : ASignal
 {
 }
@@ -42,5 +50,9 @@ public class PointsChangedSignal : ASignal
 }
 
 public class ShakeCoinsSignal : ASignal
+{
+}
+
+public class UpgradesChangedSignal : ASignal
 {
 }

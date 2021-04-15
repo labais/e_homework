@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public static Player I { get; private set; }
     public Vector3 InstantMovement { get; private set; }
     public bool IsDead { get; private set; }
+    public bool HasMoved { get; private set; }
 
     private Transform _transform;
     private Vector3 _lastPos;
@@ -17,6 +18,7 @@ public class Player : MonoBehaviour
     {
         I = this;
         _transform = transform;
+        _lastPos = _transform.position;
     }
 
     private void OnEnable()
@@ -35,6 +37,12 @@ public class Player : MonoBehaviour
     {
         InstantMovement = _lastPos - _transform.position;
         _lastPos = _transform.position;
+        
+        if (!HasMoved && InstantMovement != Vector3.zero)
+        {
+            HasMoved = true;
+            Debug.Log($"lol, moved! {InstantMovement}");
+        }
     }
 
     private void OnPlayerDied()
