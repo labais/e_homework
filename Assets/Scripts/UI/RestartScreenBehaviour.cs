@@ -40,8 +40,6 @@ public class RestartScreenBehaviour : MonoBehaviour
 
     private void TurnOn(bool freeRetry)
     {
-        Signals.Get<GreyscaleOn>().Dispatch();
-        
         _text.text = freeRetry ? "You died<br>but this one is on us" : "You're lucky<br>you have bonus lives";
         _content.SetActive(true);
         _screenAnimator.SetTrigger(Open);
