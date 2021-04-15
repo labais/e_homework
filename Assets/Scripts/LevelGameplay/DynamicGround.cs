@@ -31,7 +31,7 @@ public class DynamicGround : MonoBehaviour
     private void Start()
     {
 
-        zSize = GameDataManager.I.LevelNumber * 3 + 10;
+        zSize = GameDataManager.I.LevelNumber * 3 + 13;
                 
         Debug.Log($"DynamicGround zSize={zSize} L={GameDataManager.I.LevelNumber}");
         

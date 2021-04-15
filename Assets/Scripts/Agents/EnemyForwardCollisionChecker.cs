@@ -1,28 +1,34 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using deVoid.Utils;
 using UnityEngine;
 
 public class EnemyForwardCollisionChecker : MonoBehaviour
 {
-    public bool IsCool;
+    public bool IsCool { get; private set; }
+
+    private GameObject _parentGo;
 
     private void Start()
     {
         IsCool = true;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void SetUp(GameObject parentGo)
     {
-        // Debug.LogError($"Enemy {gameObject.name} encountered {other.gameObject}");
-        IsCool = false;
-    }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        IsCool = true;
+        _parentGo = parentGo;
     }
 
-    
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject == _parentGo) return;
+        if (other.CompareTag("Bullet")) return;
+
+        IsCool = false;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject == _parentGo) return;
+        if (other.CompareTag("Bullet")) return;
+
+        IsCool = true;
+    }
 }

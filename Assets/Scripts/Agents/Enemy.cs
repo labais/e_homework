@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using deVoid.Utils;
 using DG.Tweening;
 using UnityEngine;
@@ -64,6 +65,8 @@ public class Enemy : MonoBehaviour
                 r.material = _materialGolden;
             }
         }
+
+        _forwardChecker.SetUp(gameObject);
     }
 
     private void FixedUpdate()
@@ -77,17 +80,21 @@ public class Enemy : MonoBehaviour
             if (!_aggressive)
             {
                 if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again for less shooty-shooty
+                Debug.Log("rethink");
             }
 
             switch (_mode)
             {
                 case Mode.Wait:
                     _modeTTL = Random.Range(.01f, .1f);
+                    Debug.Log("wait");
                     break;
                 case Mode.Wander:
                     _modeTTL = Random.Range(1f, 4f);
+                    Debug.Log("wander");
                     break;
                 case Mode.Shoot:
+                    Debug.Log("shoot");
                     _modeTTL = 1;
                     break;
             }
@@ -100,6 +107,7 @@ public class Enemy : MonoBehaviour
             {
                 _mode = Mode.Wait;
                 _modeTTL = .02f;
+                Debug.Log("not cool");
             }
         }
 
