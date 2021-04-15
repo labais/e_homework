@@ -37,10 +37,10 @@ public class WinScreenBehaviour : MonoBehaviour
 
     private void OnPlayerFinished()
     {
-        SoundManager.I.Play("win", 3f, true);
+        SoundManager.I.Play("win", 5f, true);
         
         _content.SetActive(true);
-        _text1.text = $"Level {GameDataManager.I.LevelNumber.ToString("D2")} finished!";
+        _text1.text = $"Level {GameDataManager.I.LevelNumber:D2} finished!";
         _screenAnimator.SetTrigger(Open);
 
         var type = GetRandomUpgradeToBuyThatIsNotAlreadyUpgradedToMaxLevel();
@@ -90,18 +90,17 @@ public class WinScreenBehaviour : MonoBehaviour
     {
         if (Random.Range(0, 10 + 1) == 0)
         {
-            Debug.Log($"tough titties, you get no offer!");
             return UpgradeType.None;
         }
 
         if (Random.Range(0, 10 + 1) < GameDataManager.I.LevelNumber)
         {
-            Debug.Log($"simple offer");
+            // Debug.Log($"simple offer");
             return Random.Range(0, 1 + 1) == 0 ? UpgradeType.Speed : UpgradeType.TrailLength;
         }
         else
         {
-            Debug.Log($"great offer");
+            // Debug.Log($"great offer");
             return (UpgradeType) Random.Range((int) UpgradeType.Speed, GameDataManager.I.NumUpgrades);
         }
     }
