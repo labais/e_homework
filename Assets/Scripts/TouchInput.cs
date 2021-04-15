@@ -57,7 +57,7 @@ public class TouchInput : MonoBehaviour
 
         // Dirty haxxx:
         // Ignore input in bottom of the screen - give chance to onscreen gamepad
-        if (!Player.I.HasMoved && pressPos.y < 250)
+        if (!Player.I.HasMoved && pressPos.y < Screen.height / 3f)
         {
             return;
         }
