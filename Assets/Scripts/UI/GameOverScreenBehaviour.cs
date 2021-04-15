@@ -63,6 +63,8 @@ public class GameOverScreenBehaviour : MonoBehaviour
 
     private void TurnOn()
     {
+        Signals.Get<GreyscaleOn>().Dispatch();
+        
         _content.SetActive(true);
         _screenAnimator.SetTrigger(Open);
 

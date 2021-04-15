@@ -56,3 +56,7 @@ public class ShakeCoinsSignal : ASignal
 public class UpgradesChangedSignal : ASignal
 {
 }
+
+public class GreyscaleOn : ASignal
+{
+} 
