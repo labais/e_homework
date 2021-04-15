@@ -11,7 +11,8 @@ public class RestartScreenBehaviour : MonoBehaviour
     [SerializeField] private GameObject _content;
     [SerializeField] private Button _buttonContinue;
     [SerializeField] private Animator _screenAnimator;
-    [SerializeField] private TextMeshProUGUI _text;
+    [SerializeField] private TextMeshProUGUI _text1;
+    [SerializeField] private TextMeshProUGUI _text2;
 
     private const float MoveToSide = 320;
 
@@ -40,7 +41,9 @@ public class RestartScreenBehaviour : MonoBehaviour
 
     private void TurnOn(bool freeRetry)
     {
-        _text.text = freeRetry ? "You died<br>but this one is on us" : "You're lucky<br>you have bonus lives";
+        _text1.text = freeRetry ? "You died" : "You're luck";
+        _text2.text = freeRetry ? "but this one is on us" : "you have bonus lives";
+        
         _content.SetActive(true);
         _screenAnimator.SetTrigger(Open);
     }

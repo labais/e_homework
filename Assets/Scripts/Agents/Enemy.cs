@@ -80,21 +80,21 @@ public class Enemy : MonoBehaviour
             if (!_aggressive)
             {
                 if (_mode == Mode.Shoot) _mode = (Mode) Random.Range(0, 2 + 1); // randomize again for less shooty-shooty
-                Debug.Log("rethink");
+                // Debug.Log("rethink");
             }
 
             switch (_mode)
             {
                 case Mode.Wait:
                     _modeTTL = Random.Range(.01f, .1f);
-                    Debug.Log("wait");
+                    // Debug.Log("wait");
                     break;
                 case Mode.Wander:
                     _modeTTL = Random.Range(1f, 4f);
-                    Debug.Log("wander");
+                    // Debug.Log("wander");
                     break;
                 case Mode.Shoot:
-                    Debug.Log("shoot");
+                    // Debug.Log("shoot");
                     _modeTTL = 1;
                     break;
             }
@@ -107,7 +107,7 @@ public class Enemy : MonoBehaviour
             {
                 _mode = Mode.Wait;
                 _modeTTL = .02f;
-                Debug.Log("not cool");
+                // Debug.Log("not cool");
             }
         }
 
@@ -158,7 +158,7 @@ public class Enemy : MonoBehaviour
         {
             _agentEffects.AnimateDeath(AfterDeathAnimation);
             _laserLine.gameObject.SetActive(false);
-            Debug.Log("got hit by player", gameObject);
+            // Debug.Log("got hit by player", gameObject);
         }
         else if (other.CompareTag("Finish"))
         {
@@ -173,7 +173,7 @@ public class Enemy : MonoBehaviour
         {
             // Very unlikely
             _agentEffects.AnimateDeath(AfterDeathAnimation);
-            Debug.Log($"fell off map, lol not jk", gameObject);
+            // Debug.Log($"fell off map, lol not jk", gameObject);
         }
         else if (other.CompareTag("EnemyForwardChecker"))
         {
@@ -182,7 +182,7 @@ public class Enemy : MonoBehaviour
         {
             // Fall in the hole - get vaporized by player 
             _laserLine.gameObject.SetActive(false);
-            Debug.Log($"got triggered by {other.name} / {other.tag}  F={Time.frameCount}", gameObject);
+            // Debug.Log($"got triggered by {other.name} / {other.tag}  F={Time.frameCount}", gameObject);
             Vaporize();
         }
     }
@@ -204,7 +204,7 @@ public class Enemy : MonoBehaviour
             _laserLine.gameObject.SetActive(false);
         });
 
-        Debug.Log($"got vaporized F={Time.frameCount}", gameObject);
+        // Debug.Log($"got vaporized F={Time.frameCount}", gameObject);
     }
 
     private enum Mode
