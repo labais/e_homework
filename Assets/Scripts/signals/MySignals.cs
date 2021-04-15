@@ -33,7 +33,7 @@ public class DisableOnScreenGamepad : ASignal
 {
 }
 
-public class EnemyDiedSignal : ASignal
+public class EnemyDiedSignal : ASignal<bool>
 {
 }
 

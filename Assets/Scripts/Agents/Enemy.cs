@@ -10,6 +10,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] private AgentEffects _agentEffects;
     [SerializeField] private EnemyForwardCollisionChecker _forwardChecker;
     [SerializeField] private LineRenderer _laserLine;
+    [SerializeField] private Material _materialGolden;
+    
 
     private Mode _mode;
     private float _modeTTL;
@@ -20,6 +22,7 @@ public class Enemy : MonoBehaviour
     private bool _fast;
     private bool _dead;
     private bool _sharpshooter;
+    private bool _golden;
 
     private const float MaxSpeed = .007f;
     private const float MinPlayerDistanceToShoot = 10;
@@ -37,17 +40,29 @@ public class Enemy : MonoBehaviour
 
         if (_aggressive)
         {
-            Debug.Log($"Got aggressive one! L={GameDataManager.I.LevelNumber}");
+            // Debug.Log($"Got aggressive one! L={GameDataManager.I.LevelNumber}");
+            _golden = true;
         }
 
         if (_fast)
         {
-            Debug.Log($"Got fast one! L={GameDataManager.I.LevelNumber}");
+            // Debug.Log($"Got fast one! L={GameDataManager.I.LevelNumber}");
+            _golden = true;
         }
 
         if (_sharpshooter)
         {
-            Debug.Log($"Got a sharpshooter over here L={GameDataManager.I.LevelNumber}");
+            // Debug.Log($"Got a sharpshooter over here L={GameDataManager.I.LevelNumber}");
+            _golden = true;
+        }
+
+        if (_golden)
+        {
+            var renderers = transform.GetComponentsInChildren<Renderer>();
+            foreach (var r in renderers)
+            {
+                r.material = _materialGolden;
+            }
         }
     }
 
@@ -173,7 +188,7 @@ public class Enemy : MonoBehaviour
     {
         _dead = true;
 
-        Signals.Get<EnemyDiedSignal>().Dispatch();
+        Signals.Get<EnemyDiedSignal>().Dispatch(_golden);
 
         AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () =>
         {

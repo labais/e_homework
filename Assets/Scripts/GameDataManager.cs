@@ -23,7 +23,8 @@ public class GameDataManager : MonoBehaviour
     }
 
     public int Kills { get; private set; }
-
+    public string LastKillStatus { get; private set; }
+    
     public int LevelNumber { get; private set; }
     public int NumberOfHoles { get; private set; }
 
@@ -31,6 +32,7 @@ public class GameDataManager : MonoBehaviour
 
     private int _deadEnemies = 0;
     private int _deadEnemiesBefore = 0;
+    private bool _goldenKIll;
 
 
     private void Awake()
@@ -84,6 +86,22 @@ public class GameDataManager : MonoBehaviour
             }
 
             // Debug.Log($"deltaDeadEnemies={deltaDeadEnemies} p={p} frame={Time.frameCount}" );
+
+
+            LastKillStatus = "";
+            if (deltaDeadEnemies > 1) LastKillStatus = "Multikill!";
+            if (deltaDeadEnemies > 3) LastKillStatus = "Megakill!";
+            if (deltaDeadEnemies > 4) LastKillStatus = "Hyperkill!!!";
+            //@todo golden     
+
+            if (_goldenKIll)
+            {
+                p *= 2;
+                LastKillStatus = $"Golden {LastKillStatus}";
+            }
+    
+            
+
             Points += p;
         }
     }
@@ -93,9 +111,10 @@ public class GameDataManager : MonoBehaviour
         LevelNumber++;
     }
 
-    private void OnEnemyDied()
+    private void OnEnemyDied(bool golden)
     {
         _deadEnemies++;
+        _goldenKIll = golden;
     }
 
     private void OnHoleGenerated(Transform _, Transform __)

@@ -4,7 +4,6 @@ using System.Linq;
 using deVoid.Utils;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class TrackBurner : MonoBehaviour
 {
@@ -21,7 +20,7 @@ public class TrackBurner : MonoBehaviour
 
     private float _nominalCuttingTailStartingWidth;
     private float _trailLengthSeconds = 50;
-    private float _trailCuttingLengthSeconds = 2;
+    private float _trailCuttingLengthSeconds = 1.5f;
 
     const float EnemyDistanceToCut = .2f;
 
