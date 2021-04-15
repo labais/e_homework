@@ -15,7 +15,7 @@ public class GameDataManager : MonoBehaviour
     {
         get => _points;
 
-        private set
+        set
         {
             _points = value;
             Signals.Get<PointsChangedSignal>().Dispatch();
@@ -23,8 +23,8 @@ public class GameDataManager : MonoBehaviour
     }
 
     public int Kills { get; private set; }
-    public string LastKillStatus { get; private set; }
-    
+    public string LastKillStatus { get; set; }
+
     public int LevelNumber { get; private set; }
     public int NumberOfHoles { get; private set; }
 
@@ -34,6 +34,9 @@ public class GameDataManager : MonoBehaviour
     private int _deadEnemiesBefore = 0;
     private bool _goldenKIll;
 
+    public int[] Upgrades;
+    public int[] MaxLevelForUpgrades;
+    public int NumUpgrades { get; private set; }
 
     private void Awake()
     {
@@ -45,6 +48,11 @@ public class GameDataManager : MonoBehaviour
             LevelNumber = 0;
             Signals.Get<EnemyDiedSignal>().AddListener(OnEnemyDied);
             Signals.Get<HoleGeneratedSignal>().AddListener(OnHoleGenerated);
+
+            NumUpgrades = Enum.GetNames(typeof(UpgradeType)).Length;
+            Upgrades = new int[NumUpgrades];
+
+            MaxLevelForUpgrades = GenerateMaxUpgradeLevelData();
         }
         else
         {
@@ -87,7 +95,6 @@ public class GameDataManager : MonoBehaviour
 
             // Debug.Log($"deltaDeadEnemies={deltaDeadEnemies} p={p} frame={Time.frameCount}" );
 
-
             LastKillStatus = "";
             if (deltaDeadEnemies > 1) LastKillStatus = "Multikill!";
             if (deltaDeadEnemies > 3) LastKillStatus = "Megakill!";
@@ -99,9 +106,10 @@ public class GameDataManager : MonoBehaviour
                 p *= 2;
                 LastKillStatus = $"Golden {LastKillStatus}";
             }
-    
-            
 
+            p *= 1000;// -----------------------------------------------
+            Debug.LogWarning("DEBUGSHIT");
+            
             Points += p;
         }
     }
@@ -131,4 +139,55 @@ public class GameDataManager : MonoBehaviour
         _deadEnemiesBefore = 0;
         TotalTrailLength = 0;
     }
+
+    public bool IsUpgradeAtMaxLevel(UpgradeType type)
+    {
+        return Upgrades[(int) type] >= MaxLevelForUpgrades[(int) type];
+    }
+
+    public int GetUpgradePriceForNextLevelOfType(UpgradeType type)
+    {
+        switch (type)
+        {
+            case UpgradeType.Speed:
+                return (Upgrades[(int) UpgradeType.Speed] + 1) * 20;
+            case UpgradeType.TrailLength:
+                return (Upgrades[(int) UpgradeType.TrailLength] + 1) * 20;
+            case UpgradeType.ExtraLives:
+                return 100 + (Upgrades[(int) UpgradeType.ExtraLives] + 1) * 200;
+            case UpgradeType.ImmunityBalls:
+                return 500;
+            case UpgradeType.ImmunityTrailCut:
+                return 500;
+            case UpgradeType.ImmunityEnemies:
+                return 1000;
+        }
+
+        return 0;
+    }
+
+    private int[] GenerateMaxUpgradeLevelData()
+    {
+        return new[]
+        {
+            0,
+            9,
+            9,
+            2,
+            1,
+            1,
+            1,
+        };
+    }
+}
+
+public enum UpgradeType
+{
+    None,
+    Speed,
+    TrailLength,
+    ExtraLives,
+    ImmunityBalls,
+    ImmunityTrailCut,
+    ImmunityEnemies,
 }

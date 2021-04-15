@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using deVoid.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -31,6 +32,10 @@ public class DynamicGround : MonoBehaviour
     {
 
         zSize = GameDataManager.I.LevelNumber * 5 + 10;
+        
+        zSize = 20;
+        Debug.LogWarning("DEBUGSHIT");
+        
         Debug.Log($"DynamicGround zSize={zSize} L={GameDataManager.I.LevelNumber}");
         
         _xPoints = xSize * _pointsPerUnit;

@@ -22,6 +22,7 @@ public class PointsDisplayBehaviour : MonoBehaviour
         Signals.Get<PlayerFinishedSignal>().AddListener(Hide);
         Signals.Get<PlayerDiedSignal>().AddListener(Hide);
         Signals.Get<PointsChangedSignal>().AddListener(OnPointsChanged);
+        Signals.Get<ShakeCoinsSignal>().AddListener(ShakeCoins);
     }
 
     private void OnDisable()
@@ -29,6 +30,7 @@ public class PointsDisplayBehaviour : MonoBehaviour
         Signals.Get<PlayerFinishedSignal>().RemoveListener(Hide);
         Signals.Get<PlayerDiedSignal>().RemoveListener(Hide);
         Signals.Get<PointsChangedSignal>().RemoveListener(OnPointsChanged);
+        Signals.Get<ShakeCoinsSignal>().RemoveListener(ShakeCoins);
     }
 
     private void Start()
@@ -54,10 +56,11 @@ public class PointsDisplayBehaviour : MonoBehaviour
         _lastKnownPoints = GameDataManager.I.Points;
         _lastKnownKills = GameDataManager.I.Kills;
 
-        _floatingText.text = $"+{deltaPoints}";
+        _floatingText.text = deltaPoints > 0 ?  $"+{deltaPoints}" : "";
         _floatingText.fontSize = 30 + deltaKills * 3;
 
         _floatingText2.text = GameDataManager.I.LastKillStatus;
+        GameDataManager.I.LastKillStatus = "";
         _floatingText2.fontSize = 30 + deltaKills * 3;
 
         _floatingText.gameObject.SetActive(true);
@@ -71,7 +74,12 @@ public class PointsDisplayBehaviour : MonoBehaviour
 
         _sequence.AppendCallback(() => { DOVirtual.Float(0, 1, .2f, (percentage) => { _floatingTextRt.localScale = Vector3.one * percentage; }).SetEase(Ease.OutCubic); });
         _sequence.AppendCallback(() => { DOVirtual.Float(0, 1, .2f, (percentage) => { _floatingText2Rt.localScale = Vector3.one * percentage; }).SetEase(Ease.OutCubic); });
-        _sequence.AppendInterval(1);
+
+        if (deltaPoints > 0)
+        {
+            _sequence.AppendInterval(1);
+        }
+
         _sequence.AppendCallback(() =>
         {
             if (Player.I.IsDead)
@@ -84,12 +92,14 @@ public class PointsDisplayBehaviour : MonoBehaviour
 
             DOVirtual.Float(0, 1, 1f, (percentage) => { _floatingTextRt.anchoredPosition = _floatingTextOriginalPos + new Vector3(100, 220) * percentage; }).SetEase(Ease.InQuint);
 
-            DOVirtual.Float(1, 0, 1, (percentage) =>
-            {
-                int p = Mathf.RoundToInt(deltaPoints * percentage);
-                _floatingText.text = $"+{p}";
-                _text.text = $"{(visiblePoints + deltaPoints - p)}";
-            }).SetEase(Ease.InSine);
+            
+                DOVirtual.Float(1, 0, 1, (percentage) =>
+                {
+                    int p = Mathf.RoundToInt(deltaPoints * percentage);
+                    _floatingText.text = deltaPoints > 0 ? $"+{p}": "";
+                    _text.text = $"{(visiblePoints + deltaPoints - p)}";
+                }).SetEase(Ease.InSine);
+            
 
             _floatingText2.DOColor(new Color(1, 1, 1, 0), 1).SetEase(Ease.InQuad);
         });
@@ -110,4 +120,10 @@ public class PointsDisplayBehaviour : MonoBehaviour
         _floatingText2.gameObject.SetActive(false);
         _text.text = GameDataManager.I.Points.ToString();
     }
+
+    private void ShakeCoins()
+    {
+        ((RectTransform)_text.transform).DOShakeAnchorPos(.4f, new Vector2(10, .5f), 10, 5);
+    }
+
 }

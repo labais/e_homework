@@ -40,3 +40,7 @@ public class EnemyDiedSignal : ASignal<bool>
 public class PointsChangedSignal : ASignal
 {
 }
+
+public class ShakeCoinsSignal : ASignal
+{
+}
