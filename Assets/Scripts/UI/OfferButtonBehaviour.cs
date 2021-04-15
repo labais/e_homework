@@ -23,6 +23,7 @@ public class OfferButtonBehaviour : MonoBehaviour
 
     private void OnClick()
     {
+        SoundManager.I.Play("click", 1, true);
         if (!_data.CanBuy)
         {
             Signals.Get<ShakeCoinsSignal>().Dispatch();

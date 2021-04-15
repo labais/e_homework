@@ -24,6 +24,7 @@ public class PlayerCollisionChecker : MonoBehaviour
         }
         else if (other.CompareTag("Bullet"))
         {
+            SoundManager.I.Play("hit", .2f, true);
             Signals.Get<PlayerGotHitSignal>().Dispatch();
             other.GetComponent<Bullet>()?.Hit();
         }

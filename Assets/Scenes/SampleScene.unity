@@ -3417,7 +3417,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbe4116adb7da684e83cf1c63f2a81c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clips: []
+  Clips:
+  - {fileID: 8300000, guid: 1a59c07bca3bf284a8fdd9405c3b29ca, type: 3}
+  - {fileID: 8300000, guid: 0b46bcb10f8e9e3439ceb79f7d87804f, type: 3}
+  - {fileID: 8300000, guid: a35eab30cdb993548b41c00e282a6dee, type: 3}
+  - {fileID: 8300000, guid: 6176d677555da134098e973217616e33, type: 3}
+  - {fileID: 8300000, guid: 18d7de6fea5b8a04c9facadd77ae1977, type: 3}
+  - {fileID: 8300000, guid: 3c2bdcdcf57b892419d2b1c769cc208e, type: 3}
+  - {fileID: 8300000, guid: 702fdc35595b01d4e871dd4348aefe3b, type: 3}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0

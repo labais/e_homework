@@ -93,7 +93,7 @@ public class TrackBurner : MonoBehaviour
                 // Cut off all tail
                 CutTailAtIndex(_trailPoints.Count - 1);
                 _trailRendererCutting.Clear();
-
+                SoundManager.I.Play("vaporize", 1f, true);
                 return;
             }
         }
@@ -171,8 +171,13 @@ public class TrackBurner : MonoBehaviour
                 var d = Vector3.Distance(_trailPoints[i], enemy.transform.position);
                 if (d < EnemyDistanceToCut)
                 {
+                    if (_trailPoints.Count > 20)
+                    {
+                        SoundManager.I.Play("trailcut", 1f, true);
+                    }
                     CutTailAtIndex(_trailPoints.Count - 1);
                     AnimateTailLost();
+                   
                 }
             }
         }

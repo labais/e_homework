@@ -114,6 +114,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnPlayerDied()
     {
+        SoundManager.I.Play("death", .3f, true);
         _dead = true;
     }
 

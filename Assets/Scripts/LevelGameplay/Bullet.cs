@@ -32,6 +32,7 @@ public class Bullet : MonoBehaviour
         _speed = Mathf.Clamp(_speed, NormalSpeedA, NormalSpeedB); // don't let the speed get ridiculous
 
         _direction = (believedLocationInFuture - start).normalized;
+        SoundManager.I.Play("shoot", 2f, true);
     }
 
     private void FixedUpdate()

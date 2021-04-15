@@ -197,6 +197,7 @@ public class Enemy : MonoBehaviour
         _dead = true;
 
         Signals.Get<EnemyDiedSignal>().Dispatch(_golden);
+        SoundManager.I.Play("kill", .65f, true);
 
         AsyncManager.I.Delay(TimeSpan.FromSeconds(HoleAnimator.beamDuration + .01f), () =>
         {

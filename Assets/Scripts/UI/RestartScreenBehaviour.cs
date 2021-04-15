@@ -37,6 +37,7 @@ public class RestartScreenBehaviour : MonoBehaviour
     private void OnClick()
     {
         GameManager.I.NexLevel();
+        SoundManager.I.Play("click", 1, true);
     }
 
     private void TurnOn(bool freeRetry)

@@ -65,7 +65,7 @@ public class EnemyManager : MonoBehaviour
 
             if (!foundEmptySpot)
             {
-                Debug.Log("no free space to spawn enemy chunk!");
+                // Debug.Log("no free space to spawn enemy chunk!");
                 break;
             }
 
@@ -89,11 +89,11 @@ public class EnemyManager : MonoBehaviour
 
                 if (!foundEmptySpot)
                 {
-                    Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} No free space to put enemy");
+                    // Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} No free space to put enemy");
                     continue;
                 }
 
-                Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} enemy pos={enemyPosition}");
+                // Debug.Log($"EnemyManager::chunk[{i}] enemy[{j}] chunk pos={chunkPosition} enemy pos={enemyPosition}");
                 var enemy = Instantiate(_prefab, enemyPosition, Quaternion.identity, transform);
                 enemy.name = $"Enemy {_unqID++}";
                 Enemies.Add(enemy.GetComponent<Enemy>());
