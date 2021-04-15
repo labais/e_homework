@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private float _maxSpeed;
 
 
-    private bool _firstInputRecieved;
+    private bool _firstInputReceived;
     private InputMethod _selectedInputMethod = InputMethod.None;
 
     private void Start()
@@ -82,9 +82,9 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (!_firstInputRecieved && playerInput.magnitude > .1f)
+            if (!_firstInputReceived && playerInput.magnitude > .1f)
             {
-                _firstInputRecieved = true;
+                _firstInputReceived = true;
                 Signals.Get<PlayerStartedControllingSignal>().Dispatch();
             }
 

@@ -1,7 +1,9 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using deVoid.Utils;
+using UnityEngine.EventSystems;
 
 public class TouchInput : MonoBehaviour
 {
@@ -9,7 +11,7 @@ public class TouchInput : MonoBehaviour
 
     public Vector3 Target { get; private set; }
     public bool Started { get; private set; }
-    
+
     private const int TestGroundLayerMask = 1 << 6;
     private Camera _camera;
     private bool _disabled;
@@ -18,7 +20,7 @@ public class TouchInput : MonoBehaviour
     {
         _camera = Camera.main;
     }
-    
+
     private void OnEnable()
     {
         Signals.Get<PlayerFinishedSignal>().AddListener(Disable);
@@ -34,7 +36,7 @@ public class TouchInput : MonoBehaviour
     void FixedUpdate()
     {
         if (_disabled) return;
-        
+
         RaycastHit hit;
 
         var pressPos = Vector2.zero;
@@ -43,17 +45,24 @@ public class TouchInput : MonoBehaviour
         if (Input.touchCount > 0)
         {
             pressPos = Input.touches[0].position;
-            Started = true;
         }
         else if (Input.GetMouseButton(0))
         {
             pressPos = Input.mousePosition;
-            Started = true;
         }
         else
         {
             return;
         }
+
+        // Dirty haxxx:
+        // Ignore input in bottom of the screen - give chance to onscreen gamepad
+        if (!Player.I.HasMoved && pressPos.y < 250)
+        {
+            return;
+        }
+
+        Started = true;
 
         var ray = _camera.ScreenPointToRay(pressPos);
         if (Physics.Raycast(ray, out hit, float.MaxValue, TestGroundLayerMask))
@@ -68,5 +77,4 @@ public class TouchInput : MonoBehaviour
         _disabled = true;
         _pointer.gameObject.SetActive(false);
     }
-
 }
