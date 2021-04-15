@@ -41,7 +41,6 @@ public class Player : MonoBehaviour
         if (!HasMoved && InstantMovement != Vector3.zero)
         {
             HasMoved = true;
-            Debug.Log($"lol, moved! {InstantMovement}");
         }
     }
 

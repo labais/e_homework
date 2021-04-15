@@ -3425,6 +3425,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 18d7de6fea5b8a04c9facadd77ae1977, type: 3}
   - {fileID: 8300000, guid: 3c2bdcdcf57b892419d2b1c769cc208e, type: 3}
   - {fileID: 8300000, guid: 702fdc35595b01d4e871dd4348aefe3b, type: 3}
+  - {fileID: 8300000, guid: e18ac5c54e562a046b1d01eef1b7705a, type: 3}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3792,7 +3793,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1168459895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5653,30 +5654,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 329672373, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_TagString
-      value: Wall
-      objectReference: {fileID: 0}
-    - target: {fileID: 1625268983, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_TagString
-      value: Wall
-      objectReference: {fileID: 0}
-    - target: {fileID: 1958496674, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_TagString
-      value: Wall
-      objectReference: {fileID: 0}
-    - target: {fileID: 2082078611, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: m_TagString
-      value: Wall
-      objectReference: {fileID: 0}
-    - target: {fileID: 5270593721470150849, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: zSize
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 5270593721470150849, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
-      propertyPath: _pointsPerUnit
-      value: 7
-      objectReference: {fileID: 0}
     - target: {fileID: 5270593721470150850, guid: 0c6e8f073ad47404ba6ee7fbf0f4dd2d, type: 3}
       propertyPath: m_RootOrder
       value: 5
