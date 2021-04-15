@@ -21,7 +21,7 @@ public class TrackBurner : MonoBehaviour
 
     private float _nominalCuttingTailStartingWidth;
     private float _trailLengthSeconds = 50;
-    private float _trailCuttingLengthSeconds = 20; // -------------------------------------------------------------------
+    private float _trailCuttingLengthSeconds = 2;
 
     const float EnemyDistanceToCut = .2f;
 
@@ -67,8 +67,6 @@ public class TrackBurner : MonoBehaviour
         _trailPoints.Add(newPoint);
         _trailTimes.Add(DateTime.Now);
         
-         
-
         if (_trailPoints.Count < 4) return;
         var penultimatePoint = _trailPoints[_trailPoints.Count - 2];
 

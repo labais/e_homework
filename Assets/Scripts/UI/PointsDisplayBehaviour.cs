@@ -88,5 +88,6 @@ public class PointsDisplayBehaviour : MonoBehaviour
     {
         _sequence?.Kill();
         _floatingText.gameObject.SetActive(false);
+        _text.text =  GameDataManager.I.Points.ToString();
     }
 }
