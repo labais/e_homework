@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _stickContainer;
     [SerializeField] private TouchInput _touchInput;
 
+    public const float MaxSpeedBase = 7;
     private const int FinishedAutoMoveTTLNominal = 60;
     private const float MaxAcceleration = 64;
     private const float MaxStickAngle = 10f;
@@ -17,19 +18,16 @@ public class PlayerController : MonoBehaviour
     private bool _finished;
     private int _finishedAutoMoveTTL;
     private Vector3 _lastInput;
-    private float _maxSpeedBase = 7;
     private float _maxSpeed;
-
-
     private bool _firstInputReceived;
     private InputMethod _selectedInputMethod = InputMethod.None;
 
-    private void Awake()
+    private void Start()
     {
         _transform = transform;
-        _maxSpeed = _maxSpeedBase + (GameDataManager.I.GetUpgrade(UpgradeType.Speed) * .6f);
-        GameDataManager.I.PlayerSpeedUpgradeRatio = _maxSpeed / _maxSpeedBase;
-        Debug.Log($"Maxspeed={_maxSpeed} sec lvl={GameDataManager.I.GetUpgrade(UpgradeType.Speed)} ratio={GameDataManager.I.PlayerSpeedUpgradeRatio}");
+        _maxSpeed = MaxSpeedBase + (GameDataManager.I.GetUpgrade(UpgradeType.Speed) * .6f);
+        var playerSpeedUpgradeRatio = _maxSpeed / MaxSpeedBase;
+        Debug.Log($"Maxspeed={_maxSpeed} sec lvl={GameDataManager.I.GetUpgrade(UpgradeType.Speed)} ratio={playerSpeedUpgradeRatio}");
     }
 
     void OnEnable()

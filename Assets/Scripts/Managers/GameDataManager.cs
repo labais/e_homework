@@ -27,9 +27,7 @@ public class GameDataManager : MonoBehaviour
     public int LevelNumber { get; private set; }
     public int NumberOfHoles { get; private set; }
     public float TotalTrailLength { get; set; }
-
-    public float PlayerSpeedUpgradeRatio;
-
+    
     private int _deadEnemies = 0;
     private int _deadEnemiesBefore = 0;
     private bool _goldenKIll;
