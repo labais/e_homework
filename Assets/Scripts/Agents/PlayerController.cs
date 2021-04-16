@@ -24,12 +24,12 @@ public class PlayerController : MonoBehaviour
     private bool _firstInputReceived;
     private InputMethod _selectedInputMethod = InputMethod.None;
 
-    private void Start()
+    private void Awake()
     {
         _transform = transform;
         _maxSpeed = _maxSpeedBase + (GameDataManager.I.GetUpgrade(UpgradeType.Speed) * .6f);
-
-        Debug.Log($"Maxspeed={_maxSpeed} sec lvl={GameDataManager.I.GetUpgrade(UpgradeType.Speed)}");
+        GameDataManager.I.PlayerSpeedUpgradeRatio = _maxSpeed / _maxSpeedBase;
+        Debug.Log($"Maxspeed={_maxSpeed} sec lvl={GameDataManager.I.GetUpgrade(UpgradeType.Speed)} ratio={GameDataManager.I.PlayerSpeedUpgradeRatio}");
     }
 
     void OnEnable()
@@ -114,7 +114,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnPlayerDied()
     {
-        SoundManager.I.Play("death", .3f, true);
+        SoundManager.I.Play("death", .2f, true);
         _dead = true;
     }
 

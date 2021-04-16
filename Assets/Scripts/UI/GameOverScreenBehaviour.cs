@@ -25,6 +25,7 @@ public class GameOverScreenBehaviour : MonoBehaviour
     private Vector3 _textHolesOrigPos;
     private Vector3 _textTrailOrigPos;
     private const float MoveToSide = 320;
+    private bool _on;
 
     Sequence _sequence;
 
@@ -63,6 +64,9 @@ public class GameOverScreenBehaviour : MonoBehaviour
 
     private void TurnOn()
     {
+        if (_on) return;
+        _on = true;
+        
         _content.SetActive(true);
         _screenAnimator.SetTrigger(Open);
 

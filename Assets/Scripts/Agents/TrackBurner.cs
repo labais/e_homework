@@ -30,6 +30,7 @@ public class TrackBurner : MonoBehaviour
         AddPointAndCheckIfCrossed(transform.position);
         _trailRendererLong.time = _trailLengthSeconds;
         _trailCuttingLengthSeconds = _trailCuttingLengthSecondsBase + (GameDataManager.I.GetUpgrade(UpgradeType.TrailLength) * .08f);
+        _trailCuttingLengthSeconds /= GameDataManager.I.PlayerSpeedUpgradeRatio; // faster player gets shorter trail duration resulting in the same trail spatial length  
         _trailRendererCutting.time = _trailCuttingLengthSeconds;
         _nominalCuttingTailStartingWidth = _trailRendererCutting.startWidth;
         _trailRendererCutting.material = _trailCuttingMatA;
